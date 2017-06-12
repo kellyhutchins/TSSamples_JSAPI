@@ -10,6 +10,7 @@ import Polygon = require("esri/geometry/Polygon");
 import SimpleMarkerSymbol = require("esri/symbols/SimpleMarkerSymbol");
 import SimpleLineSymbol = require("esri/symbols/SimpleLineSymbol");
 import SimpleFillSymbol = require("esri/symbols/SimpleFillSymbol");
+import TextSymbol = require("esri/symbols/TextSymbol");
 
 import esri = __esri;
 
@@ -47,6 +48,18 @@ const pointGraphic = new Graphic({
     symbol: markerSymbol
 });
 
+
+/******
+ * Add text symbol 
+ */
+const textSymbol = new TextSymbol({
+    color: new Color("#fff"),
+    text: "Hello World"
+});
+const textGraphic = new Graphic({
+    geometry: point,
+    symbol: textSymbol
+})
 
 /**********************
  * Create a polyline graphic
@@ -118,4 +131,4 @@ const polygonGraphic = new Graphic({
     symbol: fillSymbol
 });
 
-view.graphics.addMany([pointGraphic, polylineGraphic, polygonGraphic]);
+view.graphics.addMany([pointGraphic, polylineGraphic, polygonGraphic, textGraphic]);

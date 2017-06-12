@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/Graphic", "esri/Color", "esri/geometry/Point", "esri/geometry/Polyline", "esri/geometry/Polygon", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol"], function (require, exports, Map, MapView, Graphic, Color, Point, Polyline, Polygon, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol) {
+define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/Graphic", "esri/Color", "esri/geometry/Point", "esri/geometry/Polyline", "esri/geometry/Polygon", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/symbols/TextSymbol"], function (require, exports, Map, MapView, Graphic, Color, Point, Polyline, Polygon, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, TextSymbol) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var map = new Map({
@@ -28,6 +28,17 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/Graphic", 
     var pointGraphic = new Graphic({
         geometry: point,
         symbol: markerSymbol
+    });
+    /******
+     * Add text symbol
+     */
+    var textSymbol = new TextSymbol({
+        color: new Color("#fff"),
+        text: "Hello World"
+    });
+    var textGraphic = new Graphic({
+        geometry: point,
+        symbol: textSymbol
     });
     /**********************
      * Create a polyline graphic
@@ -91,6 +102,6 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/Graphic", 
         geometry: polygon,
         symbol: fillSymbol
     });
-    view.graphics.addMany([pointGraphic, polylineGraphic, polygonGraphic]);
+    view.graphics.addMany([pointGraphic, polylineGraphic, polygonGraphic, textGraphic]);
 });
 //# sourceMappingURL=main.js.map
