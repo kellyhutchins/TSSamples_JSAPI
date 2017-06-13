@@ -72,7 +72,7 @@ define(["require", "exports", "esri/WebScene", "esri/Color", "esri/Graphic", "es
             const map = view.map;
             const desc = layer.portalItem.description;
             const template = `<div>${desc}</div><div class='chart-details'> <span class='esri-icon-up' aria-label='Elevation Gain'> <span id='chartAscent'></span> </span> <span class='esri-icon-down' aria-label='Elevation Loss'> <span id='chartDescent'></span> </span> <span id='chartDistance' class='chart-distance'></span></div><canvas id='popupCanvas' width='400' height='200'></canvas>`;
-            geometryEngineAsync.generalize(geometry, 100).then(queryElevation);
+            geometryEngineAsync.generalize(geometry, 50).then(queryElevation);
             return template;
         };
     }
