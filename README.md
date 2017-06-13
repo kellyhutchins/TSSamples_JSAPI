@@ -8,4 +8,9 @@ Examples of JSAPI 4.x samples and demo apps converted to TypeScript.  Use npm in
 * ExpandBasemaps: [Expand widget](https://developers.arcgis.com/javascript/latest/sample-code/widgets-expand/index.html)
 * GetStartedWithGraphics: [Get started wtih graphics](https://developers.arcgis.com/javascript/latest/sample-code/get-started-graphics/index.html)
 * ViewUi: [Simple UI](https://developers.arcgis.com/javascript/latest/sample-code/simple-ui/index.html)
-* SceneElevationLayer: [Elevation layer](https://developers.arcgis.com/javascript/latest/sample-code/scene-elevationlayer/index.html)
+* SceneElevationLayer(https://kellyhutchins.github.io/TSSamples_JSAPI/SceneElevationLayer/index.html): [Elevation layer](https://developers.arcgis.com/javascript/latest/sample-code/scene-elevationlayer/index.html)
+
+
+Other TypeScript sample apps not from the JSAPI SDK 
+
+* ElevationLayerPopup: Uses the ElevationLayer to get route statistics and draws an elevation profile using a chart. Needs some work done to smooth out the gpx routes. [Demo](https://kellyhutchins.github.io/TSSamples_JSAPI/ElevationLayerPopup/index.html)
