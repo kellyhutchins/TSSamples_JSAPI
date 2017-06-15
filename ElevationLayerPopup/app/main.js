@@ -1,9 +1,15 @@
-define(["require", "exports", "esri/WebScene", "esri/Color", "esri/Graphic", "esri/views/SceneView", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/renderers/SimpleRenderer", "esri/geometry/geometryEngineAsync", "esri/core/watchUtils", "esri/widgets/Expand"], function (require, exports, WebScene, Color, Graphic, SceneView, Point, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, geometryEngineAsync, watchUtils, Expand) {
+define(["require", "exports", "esri/WebScene", "esri/Color", "esri/Graphic", "esri/views/SceneView", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/renderers/SimpleRenderer", "esri/geometry/geometryEngineAsync", "esri/core/watchUtils", "esri/widgets/Expand", "esri/core/urlUtils"], function (require, exports, WebScene, Color, Graphic, SceneView, Point, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, geometryEngineAsync, watchUtils, Expand, urlUtils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    // set web scene id via ?webscene url param 
+    let websceneId = "79b3544f74e44a69bb280164e4744ce3";
+    const urlParams = urlUtils.urlToObject(document.location.toString());
+    if (urlParams.query && urlParams.query.webscene) {
+        websceneId = urlParams.query.webscene;
+    }
     const map = new WebScene({
         portalItem: {
-            id: "79b3544f74e44a69bb280164e4744ce3" //"8919c3f3934642358db61617af4cf512"
+            id: websceneId
         }
     });
     const highlightColor = "#63D33A";
@@ -70,7 +76,7 @@ define(["require", "exports", "esri/WebScene", "esri/Color", "esri/Graphic", "es
         layer.popupTemplate.content = (target) => {
             const geometry = target.graphic.geometry;
             const map = view.map;
-            const desc = layer.portalItem.description;
+            const desc = layer.portalItem.description || "";
             const template = `<div>${desc}</div><div class='chart-details'> <span class='esri-icon-up' aria-label='Elevation Gain'> <span id='chartAscent'></span> </span> <span class='esri-icon-down' aria-label='Elevation Loss'> <span id='chartDescent'></span> </span> <span id='chartDistance' class='chart-distance'></span></div><canvas id='popupCanvas' width='400' height='200'></canvas>`;
             geometryEngineAsync.generalize(geometry, 50).then(queryElevation);
             return template;
