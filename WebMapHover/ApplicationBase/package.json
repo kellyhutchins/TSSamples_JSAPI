@@ -1,0 +1,29 @@
+{
+  "name": "application-base-js",
+  "version": "0.0.1",
+  "description": "A core class for creating a configurable application using JavaScript/TypeScript",
+  "license" : "Apache-2.0",
+  "main": "ApplicationBase.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Esri/application-base-js.git"
+  },
+  "keywords": [
+    "Esri",
+    "ArcGIS",
+    "JavaScript",
+    "TypeScript"
+  ],
+  "dependencies": {
+    "typescript": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/arcgis-js-api": "^4.3.0",
+    "dojo-typings": "^1.11.6",
+    "tslint": "^5.1.0"
+  },
+  "scripts": {
+    "start": "npm run watch -s",
+    "watch": "tsc --watch"
+  }
+}
