@@ -5,19 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>2017: Trail Runs</title>
+    <title></title>
     <link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/css/main.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
     <script>
         var locationPath = location.pathname.replace(/\/[^\/]+$/, "");
         window.dojoConfig = {
-            packages: [
-                {
-                    name: "app",
-                    location: locationPath + "/app"
-                }
-            ]
+            packages: [{
+                name: "app",
+                location: locationPath + "/app"
+            }]
         }
     </script>
     <script src="https://js.arcgis.com/4.3"></script>
@@ -25,8 +23,8 @@
 
 <body>
     <header class="app-header">
-        <h1>2017 Trail Running Routes</h1>
-        <p>Select a route from the list then click the route to view detailed info</p>
+        <h1 id="appTitle"></h1>
+        <p>Explore the race entrants and trail info</p>
     </header>
     <div id="viewDiv">
         <canvas id="myChart" width="360" height="300"></canvas>
