@@ -14,3 +14,4 @@ Examples of JSAPI 4.x samples and demo apps converted to TypeScript.  Use npm in
 Other TypeScript sample apps not from the JSAPI SDK 
 
 * ElevationLayerPopup: Uses the ElevationLayer to get route statistics and draws an elevation profile using a chart. Needs some work done to smooth out the gpx routes. [Demo](https://kellyhutchins.github.io/TSSamples_JSAPI/ElevationLayerPopup/index.html)
+* WebMapHover: Hover over the features to view the popup info. View the source folder for app details. [Demo](https://kellyhutchins.github.io/TSSamples_JSAPI/WebMapHover/source/index.html?webmap=38cd0d9c86544a81af81800ae59bdf04)
