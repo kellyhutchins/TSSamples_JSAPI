@@ -12,12 +12,18 @@ import SimpleRenderer = require("esri/renderers/SimpleRenderer");
 import geometryEngineAsync = require("esri/geometry/geometryEngineAsync");
 import watchUtils = require("esri/core/watchUtils");
 import Expand = require("esri/widgets/Expand");
+import urlUtils = require("esri/core/urlUtils");
 import esri = __esri;
 
-
+// set web scene id via ?webscene url param 
+let websceneId = "79b3544f74e44a69bb280164e4744ce3";
+const urlParams = urlUtils.urlToObject(document.location.toString());
+if (urlParams.query && urlParams.query.webscene) {
+    websceneId = urlParams.query.webscene;
+}
 const map = new WebScene({
     portalItem: {
-        id: "79b3544f74e44a69bb280164e4744ce3"//"8919c3f3934642358db61617af4cf512"
+        id: websceneId
     }
 });
 
@@ -87,9 +93,8 @@ function updatePopup(layer: FeatureLayer) {
 
         const geometry: Polyline = target.graphic.geometry;
         const map: Map = view.map;
-        const desc: string = layer.portalItem.description;
+        const desc: string = layer.portalItem.description || "";
         const template = `<div>${desc}</div><div class='chart-details'> <span class='esri-icon-up' aria-label='Elevation Gain'> <span id='chartAscent'></span> </span> <span class='esri-icon-down' aria-label='Elevation Loss'> <span id='chartDescent'></span> </span> <span id='chartDistance' class='chart-distance'></span></div><canvas id='popupCanvas' width='400' height='200'></canvas>`;
-
 
         geometryEngineAsync.generalize(geometry, 50).then(queryElevation);
 
