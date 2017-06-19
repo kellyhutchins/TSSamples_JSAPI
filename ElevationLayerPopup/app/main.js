@@ -46,6 +46,8 @@ define(["require", "exports", "esri/WebScene", "esri/Color", "esri/Graphic", "es
     });
     // Create elevation toggle button and slides and add to view 
     view.then(() => {
+        document.title = map.portalItem.title;
+        document.getElementById("appTitle").innerHTML = map.portalItem.title;
         createElevationButton();
         if (map.presentation.slides && map.presentation.slides.length && map.presentation.slides.length > 0) {
             createInfoContainer(map.presentation.slides);

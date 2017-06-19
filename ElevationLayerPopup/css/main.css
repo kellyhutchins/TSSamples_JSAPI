@@ -1,93 +1,97 @@
-html, body, #viewDiv{
-padding:0;
-margin:0;
-height:100%;
-width:100%;
+html,
+body,
+#viewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
 }
-button{
-    border:none;
+
+button {
+    border: none;
 }
-/*button{
-    background-color:#4D71A3;
-    border:none;
-    border-bottom: 1px solid #4D71A3;
-    color:#fff;
-    padding:10px 24px;
-    margin:0 auto;
+
+.esri-popup__header-title {
+    color: #4D71A3;
 }
-button:hover{
-    background-color:#88ACE0;
-}*/
- .esri-popup__header-title{
-     color:#4D71A3;
- }
- .chart-details{
-     margin:0 0.5em 2em 0.5em;
- }
- .chart-distance{
-     float:right;
-     font-weight: bold;
- }
- .esri-icon-down:before, .esri-icon-up:before{
-     font-size:16px;
-     font-weight: bold;
- }
- .esri-icon-up:before{
-     color:green;
- }
- .esri-icon-down:before{
-     color:red;
- }
- .slide-container{
-    background: rgba(0,0,0,0.50);
-    width:153px;
-    color:#fff;
+
+.chart-details {
+    margin: 0 0.5em 2em 0.5em;
+}
+
+.chart-distance {
+    float: right;
+    font-weight: bold;
+}
+
+.esri-icon-down:before,
+.esri-icon-up:before {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.esri-icon-up:before {
+    color: green;
+}
+
+.esri-icon-down:before {
+    color: red;
+}
+
+.slide-container {
+    background: rgba(0, 0, 0, 0.50);
+    width: 153px;
+    color: #fff;
     overflow-y: auto;
     text-align: center;
     height: 260px;
-    padding:0 1em 1em 1em;
- }
- .slide{
-     cursor: pointer;
- }
- .slide-title{
+    padding: 0 1em 1em 1em;
+}
+
+.slide {
+    cursor: pointer;
+}
+
+.slide-title {
     position: relative;
-    top: 20px;
     margin: 0 3px;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     max-width: 140px;
-    text-align: left;
+    text-align: center;
     color: white;
-    text-shadow: 0 0 1px black,0 0 2px black, 0 0 3px black;
- }
- .active img{
-      box-shadow: 0 0 12px #ccc;
-      border-style: solid;
-      border-width: thin;
-      border-color: #ccc;
- }
- .bookmark-header{
-     margin-bottom: 0.5em;
- }
- .app-header{
-     position: absolute;
-     top:0;
-     left:0;
-     right:0;
-     height:100px;
-     background:rgba(0,0,0,0.17);
-     color:#fff;
-     z-index: 1;
-     padding-left: 1em;
-     margin-bottom: 0;
- }
- .app-header p{
-     padding-left:1.2em;
-     margin-top:0;
- }
- h1{
-     padding-bottom:0;
-     margin-bottom:6px;
- }
+    text-shadow: 0 0 1px black, 0 0 2px black, 0 0 3px black;
+}
+
+.active img {
+    box-shadow: 0 0 12px #ccc;
+    border-style: solid;
+    border-width: thin;
+    border-color: #ccc;
+}
+
+.bookmark-header {
+    margin-bottom: 0.5em;
+}
+
+.app-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: rgba(0, 0, 0, 0.17);
+    color: #fff;
+    z-index: 1;
+    padding-left: 1em;
+    margin-bottom: 0;
+}
+
+.app-header p {
+    padding-left: 1.2em;
+    margin-top: 0;
+}
+
+h1 {
+    padding-bottom: 0;
+    margin-bottom: 6px;
+}

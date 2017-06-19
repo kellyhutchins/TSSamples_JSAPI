@@ -27,6 +27,7 @@ const map = new WebScene({
     }
 });
 
+
 const highlightColor = "#63D33A"
 const view = new SceneView({
     map: map,
@@ -61,6 +62,8 @@ view.popup.on("trigger-action", (evt) => {
 });
 // Create elevation toggle button and slides and add to view 
 view.then(() => {
+    document.title = map.portalItem.title;
+    document.getElementById("appTitle").innerHTML = map.portalItem.title;
     createElevationButton();
     if (map.presentation.slides && map.presentation.slides.length && map.presentation.slides.length > 0) {
         createInfoContainer(map.presentation.slides);
