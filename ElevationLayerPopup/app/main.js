@@ -107,7 +107,8 @@ define(["require", "exports", "esri/WebScene", "esri/WebMap", "esri/Color", "esr
         layer.popupTemplate.content = (target) => {
             const geometry = target.graphic.geometry;
             const map = view.map;
-            const content = origContent.content;
+            const t = origContent.clone();
+            let content = t.content;
             const template = `<h4>Elevation Profile</h4><div class='chart-details'> <span class='esri-icon-up' aria-label='Elevation Gain'> <span id='chartAscent'></span> </span> <span class='esri-icon-down' aria-label='Elevation Loss'> <span id='chartDescent'></span> </span> <span id='chartDistance' class='chart-distance'></span></div><canvas id='popupCanvas' width='400' height='200'></canvas>`;
             content.push({
                 type: "text",
