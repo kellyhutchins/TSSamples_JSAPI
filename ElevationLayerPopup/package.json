@@ -10,6 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "@types/arcgis-js-api": "^4.3.1",
-    "@types/chart.js": "^2.4.3"
+    "@types/chart.js": "^2.4.6"
   }
 }

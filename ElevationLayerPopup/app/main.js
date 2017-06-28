@@ -1,16 +1,37 @@
-define(["require", "exports", "esri/WebScene", "esri/Color", "esri/Graphic", "esri/views/SceneView", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/renderers/SimpleRenderer", "esri/geometry/geometryEngineAsync", "esri/core/watchUtils", "esri/widgets/Expand", "esri/core/urlUtils"], function (require, exports, WebScene, Color, Graphic, SceneView, Point, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, geometryEngineAsync, watchUtils, Expand, urlUtils) {
+define(["require", "exports", "esri/WebScene", "esri/WebMap", "esri/Color", "esri/Graphic", "esri/layers/ElevationLayer", "esri/Ground", "esri/views/SceneView", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/renderers/SimpleRenderer", "esri/geometry/geometryEngineAsync", "esri/core/watchUtils", "esri/widgets/Expand", "esri/core/urlUtils"], function (require, exports, WebScene, WebMap, Color, Graphic, ElevationLayer, Ground, SceneView, Point, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, geometryEngineAsync, watchUtils, Expand, urlUtils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // set web scene id via ?webscene url param 
     let websceneId = "79b3544f74e44a69bb280164e4744ce3";
+    let webmapId = null;
     const urlParams = urlUtils.urlToObject(document.location.toString());
     if (urlParams.query && urlParams.query.webscene) {
         websceneId = urlParams.query.webscene;
     }
-    const map = new WebScene({
-        portalItem: {
-            id: websceneId
-        }
+    else if (urlParams.query && urlParams.query.webmap) {
+        webmapId = urlParams.query.webmap;
+    }
+    let map;
+    if (!webmapId) {
+        map = new WebScene({
+            portalItem: {
+                id: websceneId
+            }
+        });
+    }
+    else {
+        map = new WebMap({
+            portalItem: {
+                id: webmapId
+            }
+        });
+    }
+    // add the ground layer 
+    const elevationLayer = new ElevationLayer({
+        url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"
+    });
+    map.ground = new Ground({
+        layers: [elevationLayer]
     });
     const highlightColor = "#63D33A";
     const view = new SceneView({
@@ -48,7 +69,9 @@ define(["require", "exports", "esri/WebScene", "esri/Color", "esri/Graphic", "es
     view.then(() => {
         document.title = map.portalItem.title;
         document.getElementById("appTitle").innerHTML = map.portalItem.title;
-        createElevationButton();
+        if (map.ground && map.ground.layers && map.ground.layers.length && map.ground.layers.length > 0) {
+            createElevationButton();
+        }
         if (map.presentation.slides && map.presentation.slides.length && map.presentation.slides.length > 0) {
             createInfoContainer(map.presentation.slides);
         }
@@ -193,7 +216,7 @@ define(["require", "exports", "esri/WebScene", "esri/Color", "esri/Graphic", "es
                         backgroundColor: "rgba(66,113,232440,0.1)",
                         borderColor: highlightColor,
                         borderCapStyle: "round",
-                        boderJoinStyle: "round"
+                        borderJoinStyle: "round"
                     },
                 ]
             },
