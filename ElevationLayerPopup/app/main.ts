@@ -4,6 +4,7 @@ import Map = require("esri/Map");
 import Color = require("esri/Color");
 import Graphic = require("esri/Graphic");
 import ElevationLayer = require("esri/layers/ElevationLayer");
+import PopupTemplate = require("esri/PopupTemplate");
 import Ground = require("esri/Ground");
 import SceneView = require("esri/views/SceneView");
 import Point = require("esri/geometry/Point");
@@ -60,7 +61,7 @@ const view = new SceneView({
         fillOpacity: 0.2
     },
     padding: {
-        top: 100,
+        top: 70,
         right: 0,
         left: 0,
         bottom: 0
@@ -116,17 +117,27 @@ function updateLayerSymbology(layer: FeatureLayer) {
 }
 function updatePopup(layer: FeatureLayer) {
     // Set popup content to function if its a polyline feature layer 
-    layer.popupTemplate.title = layer.portalItem.title;
-    layer.popupTemplate.content = (target) => {
+    let origContent: PopupTemplate;
+    if (layer.popupTemplate) {
+        origContent = layer.popupTemplate.clone();
+    } else {
+        origContent = new PopupTemplate();
+    }
 
+    layer.popupTemplate.content = (target) => {
         const geometry: Polyline = target.graphic.geometry;
         const map: Map = view.map;
-        const desc: string = layer.portalItem.description || "";
-        const template = `<div>${desc}</div><div class='chart-details'> <span class='esri-icon-up' aria-label='Elevation Gain'> <span id='chartAscent'></span> </span> <span class='esri-icon-down' aria-label='Elevation Loss'> <span id='chartDescent'></span> </span> <span id='chartDistance' class='chart-distance'></span></div><canvas id='popupCanvas' width='400' height='200'></canvas>`;
+        const content = origContent.content as any[];
+        const template = `<h4>Elevation Profile</h4><div class='chart-details'> <span class='esri-icon-up' aria-label='Elevation Gain'> <span id='chartAscent'></span> </span> <span class='esri-icon-down' aria-label='Elevation Loss'> <span id='chartDescent'></span> </span> <span id='chartDistance' class='chart-distance'></span></div><canvas id='popupCanvas' width='400' height='200'></canvas>`;
 
+        content.push({
+            type: "text",
+            text: template
+        });
         geometryEngineAsync.generalize(geometry, 50).then(queryElevation);
 
-        return template;
+
+        return content;
     }
 }
 function queryElevation(geometry: Polyline) {

@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/WebScene", "esri/WebMap", "esri/Color", "esri/Graphic", "esri/layers/ElevationLayer", "esri/Ground", "esri/views/SceneView", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/renderers/SimpleRenderer", "esri/geometry/geometryEngineAsync", "esri/core/watchUtils", "esri/widgets/Expand", "esri/core/urlUtils"], function (require, exports, WebScene, WebMap, Color, Graphic, ElevationLayer, Ground, SceneView, Point, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, geometryEngineAsync, watchUtils, Expand, urlUtils) {
+define(["require", "exports", "esri/WebScene", "esri/WebMap", "esri/Color", "esri/Graphic", "esri/layers/ElevationLayer", "esri/PopupTemplate", "esri/Ground", "esri/views/SceneView", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/renderers/SimpleRenderer", "esri/geometry/geometryEngineAsync", "esri/core/watchUtils", "esri/widgets/Expand", "esri/core/urlUtils"], function (require, exports, WebScene, WebMap, Color, Graphic, ElevationLayer, PopupTemplate, Ground, SceneView, Point, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, geometryEngineAsync, watchUtils, Expand, urlUtils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // set web scene id via ?webscene url param 
@@ -43,7 +43,7 @@ define(["require", "exports", "esri/WebScene", "esri/WebMap", "esri/Color", "esr
             fillOpacity: 0.2
         },
         padding: {
-            top: 100,
+            top: 70,
             right: 0,
             left: 0,
             bottom: 0
@@ -97,14 +97,24 @@ define(["require", "exports", "esri/WebScene", "esri/WebMap", "esri/Color", "esr
     }
     function updatePopup(layer) {
         // Set popup content to function if its a polyline feature layer 
-        layer.popupTemplate.title = layer.portalItem.title;
+        let origContent;
+        if (layer.popupTemplate) {
+            origContent = layer.popupTemplate.clone();
+        }
+        else {
+            origContent = new PopupTemplate();
+        }
         layer.popupTemplate.content = (target) => {
             const geometry = target.graphic.geometry;
             const map = view.map;
-            const desc = layer.portalItem.description || "";
-            const template = `<div>${desc}</div><div class='chart-details'> <span class='esri-icon-up' aria-label='Elevation Gain'> <span id='chartAscent'></span> </span> <span class='esri-icon-down' aria-label='Elevation Loss'> <span id='chartDescent'></span> </span> <span id='chartDistance' class='chart-distance'></span></div><canvas id='popupCanvas' width='400' height='200'></canvas>`;
+            const content = origContent.content;
+            const template = `<h4>Elevation Profile</h4><div class='chart-details'> <span class='esri-icon-up' aria-label='Elevation Gain'> <span id='chartAscent'></span> </span> <span class='esri-icon-down' aria-label='Elevation Loss'> <span id='chartDescent'></span> </span> <span id='chartDistance' class='chart-distance'></span></div><canvas id='popupCanvas' width='400' height='200'></canvas>`;
+            content.push({
+                type: "text",
+                text: template
+            });
             geometryEngineAsync.generalize(geometry, 50).then(queryElevation);
-            return template;
+            return content;
         };
     }
     function queryElevation(geometry) {
