@@ -1,7 +1,10 @@
 import WebScene = require("esri/WebScene");
+import WebMap = require("esri/WebMap");
 import Map = require("esri/Map");
 import Color = require("esri/Color");
 import Graphic = require("esri/Graphic");
+import ElevationLayer = require("esri/layers/ElevationLayer");
+import Ground = require("esri/Ground");
 import SceneView = require("esri/views/SceneView");
 import Point = require("esri/geometry/Point");
 import Polyline = require("esri/geometry/Polyline");
@@ -17,17 +20,36 @@ import esri = __esri;
 
 // set web scene id via ?webscene url param 
 let websceneId = "79b3544f74e44a69bb280164e4744ce3";
+let webmapId = null;
 const urlParams = urlUtils.urlToObject(document.location.toString());
 if (urlParams.query && urlParams.query.webscene) {
     websceneId = urlParams.query.webscene;
+} else if (urlParams.query && urlParams.query.webmap) {
+    webmapId = urlParams.query.webmap;
 }
-const map = new WebScene({
-    portalItem: {
-        id: websceneId
-    }
+let map: WebMap | WebScene;
+
+if (!webmapId) {
+    map = new WebScene({
+        portalItem: {
+            id: websceneId
+        }
+    });
+
+} else {
+    map = new WebMap({
+        portalItem: {
+            id: webmapId
+        }
+    });
+}
+// add the ground layer 
+const elevationLayer = new ElevationLayer({
+    url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"
 });
-
-
+map.ground = new Ground({
+    layers: [elevationLayer]
+})
 const highlightColor = "#63D33A"
 const view = new SceneView({
     map: map,
@@ -51,7 +73,8 @@ const view = new SceneView({
             position: "top-right"
         }
     }
-});
+})
+
 view.popup.on("trigger-action", (evt) => {
     if (evt.action.id === "zoom-to") {
         const geom = view.popup.selectedFeature.geometry;
@@ -64,7 +87,9 @@ view.popup.on("trigger-action", (evt) => {
 view.then(() => {
     document.title = map.portalItem.title;
     document.getElementById("appTitle").innerHTML = map.portalItem.title;
-    createElevationButton();
+    if (map.ground && map.ground.layers && map.ground.layers.length && map.ground.layers.length > 0) {
+        createElevationButton();
+    }
     if (map.presentation.slides && map.presentation.slides.length && map.presentation.slides.length > 0) {
         createInfoContainer(map.presentation.slides);
     }
@@ -92,7 +117,7 @@ function updateLayerSymbology(layer: FeatureLayer) {
 function updatePopup(layer: FeatureLayer) {
     // Set popup content to function if its a polyline feature layer 
     layer.popupTemplate.title = layer.portalItem.title;
-    layer.popupTemplate.content = (target: any) => {
+    layer.popupTemplate.content = (target) => {
 
         const geometry: Polyline = target.graphic.geometry;
         const map: Map = view.map;
@@ -207,7 +232,7 @@ function createChart(vals: number[], labels: string[]) {
     Chart.defaults.global.legend = false;
     var chart = new Chart(context, {
         type: 'line',
-        data: {
+        data: <any>{
             labels: labels,
             datasets: [
                 {
@@ -222,7 +247,7 @@ function createChart(vals: number[], labels: string[]) {
                     backgroundColor: "rgba(66,113,232440,0.1)",
                     borderColor: highlightColor,
                     borderCapStyle: "round",
-                    boderJoinStyle: "round"
+                    borderJoinStyle: "round"
                 },
 
             ]
