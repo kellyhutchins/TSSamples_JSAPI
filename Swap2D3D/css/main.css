@@ -1,0 +1,15 @@
+html,
+body,
+#viewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+button {
+    border-width: 1px;
+    border-style: none;
+    width: 32px;
+    height: 32px;
+}
