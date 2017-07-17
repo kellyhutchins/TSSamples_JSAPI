@@ -1,0 +1,41 @@
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+      color: white;
+      font-family: "Avenir Next W01", "Arial", sans-serif;
+    }
+
+    .btn-group {
+      position: absolute;
+      top: 0;
+      right:5px;
+      width: 150px;
+      z-index: 1;
+      display: block;
+    }
+
+    .btn-group button {
+      background: white;
+      border: 1px solid #005e95;
+      font-size: 0.9em;
+      color: #005e95;
+      width:100%;
+      padding:10px 24px;
+    }
+    .btn-group button:not(:last-child){
+        border-bottom:none;
+    }
+    .btn-group:after{
+        content:"";
+        clear:both;
+        display:table;
+    }
+    .btn-group button:hover {
+      background: #005e95;
+      color: white;
+      cursor: pointer;
+    }

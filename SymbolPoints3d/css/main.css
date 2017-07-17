@@ -1,0 +1,19 @@
+html,
+body,
+#viewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.tool-panel {
+    background-color: #ccc;
+    background-color: rgba(144, 144, 144, 0.5);
+    color: #fff;
+    padding: 1em;
+    position: absolute;
+    right: 0.5em;
+    top: 1em;
+    z-index: 1;
+}

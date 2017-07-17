@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flat vs. volunetric 3D symbol layers</title>
+</head>
+<link rel="stylesheet" href="https://jsdev.arcgis.com/4.4/esri/css/main.css">
+<link rel="stylesheet" href="css/main.css">
+<script>
+    var locationPath = location.pathname.replace(/\/[^\/]+$/, "");
+    window.dojoConfig = {
+        packages: [{
+            name: "app",
+            location: locationPath + "/app"
+        }]
+    }
+</script>
+<script src="https://jsdev.arcgis.com/4.4"></script>
+
+<body>
+    <div id="viewDiv">
+        <div class="tool-panel">
+            <input type="radio" name="symbolType" value="icon" checked="checked" id="asIcon" />
+            <label for="asIcon">2D shape </label>
+            <input type="radio" name="symbolType" value="object" id="asObject" />
+            <label for="asObject">3D shape</label>
+        </div>
+
+    </div>
+    <script>
+        require(["app/main"]);
+    </script>
+</body>
+
+</html>
