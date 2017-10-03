@@ -52,7 +52,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         ], ExaggeratedElevationlayer);
         return ExaggeratedElevationlayer;
     }(decorators_1.declared(BaseElevationLayer)));
-    //export = ExaggeratedElevationlayer;
     var map = new Map({
         basemap: Basemap.fromId("satellite"),
         ground: {

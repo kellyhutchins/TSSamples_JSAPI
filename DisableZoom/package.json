@@ -6,7 +6,9 @@
   "dependencies": {
     "@types/arcgis-js-api": "^4.4.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/arcgis-js-api": "^4.5.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

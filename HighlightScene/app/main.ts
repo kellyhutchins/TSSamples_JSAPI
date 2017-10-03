@@ -1,12 +1,14 @@
 import WebScene = require("esri/WebScene");
 import Color = require("esri/Color");
-import Search = require("esri/widgets/Search");
+import Query = require("esri/tasks/support/Query");
 import SceneView = require("esri/views/SceneView");
+import Legend = require("esri/widgets/Legend");
 
+import esri = __esri;
 
 const map = new WebScene({
     portalItem: {
-        id: "646f2077af3143c78ab80c33c608cbf0"
+        id: "fbbc829fa7d342e7ae8d18c54a5eab37"
     }
 });
 const view = new SceneView({
@@ -26,22 +28,52 @@ const view = new SceneView({
 
 let highlight: IHandle;
 view.then(() => {
-    console.log("map", map.layers);
-    const officeSceneLayer = map.layers.find((layer) => {
-        return layer.title === "Floor 1";
+    let officeSceneLayer;
+    map.allLayers.some((layer) => {
+        if (layer.title === "Esri Offices") {
+            officeSceneLayer = layer;
+            return true;
+        }
     });
-    console.log(officeSceneLayer.layers);
-    // Setup search to find a room 
-    if (officeSceneLayer) {
-        const searchWidget = new Search({
-            view: view,
-            allPlaceholder: "Search for room",
-            sources: [{
-                featureLayer: officeSceneLayer.layers[0],
-                searchFields: []
-            }]
+
+    const container = document.getElementById("roomsList");
+    view.whenLayerView(officeSceneLayer).then((officeLayerView: esri.FeatureLayerView) => {
+        officeLayerView.watch("updating", (val) => {
+            const query = new Query({
+                outFields: ["*"]
+            });
+            officeLayerView.queryFeatures(query).then((results: any) => {
+                container.innerHTML = "";
+                results.features.forEach((feature: esri.Graphic) => {
+                    const attributes = feature.attributes;
+                    if (attributes.SPACETYPE === "Office") {
+                        const li = document.createElement("li");
+                        li.setAttribute("class", "panel-result");
+                        li.innerHTML = `Room ${attributes.ROOMNUMBER}`;
+                        li.addEventListener("click", (evt) => {
+                            const queryExent = new Query({
+                                objectIds: [feature.attributes.OBJECTID]
+                            });
+                            officeLayerView.queryExtent(queryExent).then((result) => {
+                                view.goTo(result.extent.expand(7), {
+                                    speedFactor: 0.5
+                                });
+                                if (highlight) {
+                                    highlight.remove();
+                                }
+                                highlight = officeLayerView.highlight([feature.attributes.OBJECTID]);
+                            });
+                        });
+                        container.appendChild(li);
+                    }
+                });
+
+            });
         });
-    }
-
-
+    });
+    const legend = new Legend({
+        view: view
+    });
+    view.ui.empty("top-left");
+    view.ui.add(legend, "bottom-left");
 });

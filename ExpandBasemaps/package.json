@@ -9,7 +9,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@types/arcgis-js-api": "^4.3.0"
+  "dependencies": {},
+  "devDependencies": {
+    "@types/arcgis-js-api": "^4.5.0"
   }
 }

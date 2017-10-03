@@ -1,8 +1,54 @@
 html,
 body,
 #viewDiv {
-    padding: 0;
-    margin: 0;
     height: 100%;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+.panel-side {
+    width: 200px;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    bottom: 28px;
+    color: #323232;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    z-index: 60;
+    font-size: 12px;
+    text-align: center;
+}
+
+.panel-side h2 {
+    padding: 0 20px;
+    margin: 20px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.panel-side ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-weight: 100;
+}
+
+.panel-side li {
+    list-style: none;
+    padding: 3px 10px;
+}
+
+.panel-result {
+    cursor: pointer;
+    margin: 2px 0;
+}
+
+.panel-result:hover,
+.panel-result:focus,
+.panel-result.selected {
+    background-color: rgba(200, 200, 200, 0.6);
 }

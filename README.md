@@ -3,6 +3,7 @@
 Examples of JSAPI 4.x samples and demo apps converted to TypeScript.  Use npm install in the individual sample folder to install sample dependencies. 
 
 * [ArcadeExpression](https://kellyhutchins.github.io/TSSamples_JSAPI/ArcadeExpression/index.html): [Reference Arcade Expression](https://developers.arcgis.com/javascript/latest/sample-code/popuptemplate-arcade/index.html)
+* [Composite Views](https://kellyhutchins.github.io/TSSamples_JSAPI/CompositeViews/index.html): [Composite Views Sample](https://developers.arcgis.com/javascript/latest/sample-code/views-composite-views/index.html)
 * [CustomBasemap](https://kellyhutchins.github.io/TSSamples_JSAPI/CustomBasemap/index.html): [Custom Basemap](https://developers.arcgis.com/javascript/latest/sample-code/basemap-custom/index.html)
 * [CustomTileLayer](https://kellyhutchins.github.io/TSSamples_JSAPI/CustomTileLayer/index.html): [Custom Tile Layer](https://developers.arcgis.com/javascript/latest/sample-code/layers-custom-tilelayer/index.html)
 * [ColorizeTexturedBuildings](https://kellyhutchins.github.io/TSSamples_JSAPI/ColoringOptionsTextured/index.html): [Coloring options for Textured Buildings](https://developers.arcgis.com/javascript/latest/sample-code/layers-scenelayer-color-mix-mode/index.html)

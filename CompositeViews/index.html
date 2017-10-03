@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Create an app with composite views - 4.5</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.5/esri/css/main.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script>
+        var locationPath = location.pathname.replace(/\/[^\/]+$/, "");
+        window.dojoConfig = {
+            has: {
+                "esri-featurelayer-webgl": 1
+            },
+            packages: [{
+                name: "app",
+                location: locationPath + "/app"
+            }]
+        }
+    </script>
+    <script src="https://js.arcgis.com/4.5"></script>
+</head>
+
+<body>
+    <div id="mainViewDiv"></div>
+    <div id="akViewDiv"></div>
+    <div id="hiViewDiv"></div>
+    <script>
+        require(["app/main"]);
+    </script>
+</body>
+
+</html>

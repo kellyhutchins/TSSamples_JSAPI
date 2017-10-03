@@ -124,7 +124,8 @@ define(["require", "exports", "esri/WebScene", "esri/WebMap", "esri/Color", "esr
                 document.getElementById("chartDistance").innerHTML = Math.round(length) + " miles";
             });
             let ascent = 0, descent = 0, vals = [], labels = [];
-            response.geometry.paths.forEach((path) => {
+            const geom = response.geometry;
+            geom.paths.forEach((path) => {
                 for (var i = 1; i < path.length; i++) {
                     vals.push(Math.round((path[i][2] / 0.3048)));
                     labels.push(path[i][0] + "," + path[i][1]);

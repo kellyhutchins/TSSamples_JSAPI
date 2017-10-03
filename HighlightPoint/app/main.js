@@ -15,13 +15,11 @@ define(["require", "exports", "esri/WebScene", "esri/views/SceneView", "esri/Col
             haloOpacity: 0.25
         }
     });
-    // these two highlight handlers are used for selection and hovering over features 
     webscene.load().then(() => {
         // Get layer from scene view
         const stationLayer = webscene.layers.getItemAt(1);
         // highlight is set on the layerview so we need to detect
         // when the layer view is ready
-        //let highlightSelect: any;
         view.whenLayerView(stationLayer).then(lyrView => {
             const queryStations = stationLayer.createQuery();
             const filterButtons = document.querySelectorAll("button");
@@ -35,7 +33,8 @@ define(["require", "exports", "esri/WebScene", "esri/views/SceneView", "esri/Col
                         if (handler) {
                             handler.remove();
                         }
-                        handler = lyrView.highlight(feature.attributes["OBJECTID"]);
+                        const flayerView = lyrView;
+                        handler = flayerView.highlight(feature.attributes["OBJECTID"]);
                         view.goTo({
                             target: feature.geometry,
                             tilt: 70

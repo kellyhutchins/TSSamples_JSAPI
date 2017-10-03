@@ -7,8 +7,8 @@ define(["require", "exports", "esri/Map", "esri/views/MapView"], function (requi
     var view = new MapView({
         map: map,
         container: "viewDiv",
-        center: [-118.244, 34.052],
-        zoom: 12
+        center: [15, 65],
+        zoom: 4
     });
 });
 //# sourceMappingURL=main.js.map

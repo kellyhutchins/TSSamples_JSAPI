@@ -82,7 +82,7 @@ const map = new Map({
 
 const view = new SceneView({
   map: map,
-  center: [0, 30],
+  center: [0, 30] as any,
   zoom: 3,
   container: "viewDiv"
 });

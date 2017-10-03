@@ -45,7 +45,7 @@ const sceneLayer = new SceneLayer({
 });
 
 const map = new Map({
-    basemap: "dark-gray",
+    basemap: "dark-gray" as any,
     layers: [sceneLayer]
 });
 

@@ -3,15 +3,15 @@ import MapView = require("esri/views/MapView");
 import SceneView = require("esri/views/SceneView");
 import esri = __esri;
 const map = new Map({
-    basemap: "streets",
-    ground: "world-elevation"
+    basemap: "streets" as any,
+    ground: "world-elevation" as any
 });
 
 const initialViewParams: esri.SceneViewProperties | esri.MapViewProperties = {
     container: "viewDiv",
     map: map,
     zoom: 4,
-    center: [15, 65]
+    center: [15, 65] as any
 };
 
 // Add 2d/3d view switch button 

@@ -15,12 +15,12 @@ import TextSymbol = require("esri/symbols/TextSymbol");
 import esri = __esri;
 
 const map = new Map({
-    basemap: "hybrid"
+    basemap: "hybrid" as any
 });
 const view = new MapView({
     map: map,
     container: "viewDiv",
-    center: [-80, 35],
+    center: [-80, 35] as any,
     zoom: 3
 });
 

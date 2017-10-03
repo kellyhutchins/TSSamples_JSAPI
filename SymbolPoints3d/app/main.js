@@ -51,14 +51,14 @@ define(["require", "exports", "esri/Map", "esri/views/SceneView", "esri/Color", 
         symbol: new LabelSymbol3D({
             symbolLayers: [new TextSymbol3DLayer({
                     material: {
-                        color: "#fff"
+                        color: new Color("#fff")
                     },
                     size: 10
                 })]
         }),
         labelPlacement: "above-right",
         labelExpressionInfo: {
-            value: "{CITY_NAME}"
+            expression: "$feature.CITY_NAME",
         }
     });
     var featureLayer = new FeatureLayer({

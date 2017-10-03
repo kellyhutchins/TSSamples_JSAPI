@@ -1,3 +1,5 @@
+/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
+/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -19,11 +21,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     Object.defineProperty(exports, "__esModule", { value: true });
     var TintLayer = (function (_super) {
         __extends(TintLayer, _super);
-        function TintLayer() {
-            return _super !== null && _super.apply(this, arguments) || this;
+        function TintLayer(params) {
+            return _super.call(this) || this;
         }
         TintLayer.prototype.getTileUrl = function (level, row, col) {
-            return this.urlTemplate.replace("{z}", level).replace("{x}", col).replace("{y}", row);
+            return this.urlTemplate.replace("{z}", "" + level).replace("{x}", "" + col).replace("{y}", "" + row);
         };
         TintLayer.prototype.fetchTile = function (level, row, col) {
             var _this = this;
@@ -31,7 +33,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return esriRequest(url, {
                 responseType: "image",
                 allowImageDataAccess: true
-            }).then(function (response) {
+            })
+                .then(function (response) {
                 var image = response.data;
                 var size = _this.tileInfo.size[0];
                 var canvas = document.createElement("canvas");
@@ -42,7 +45,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 if (_this.tint) {
                     context.fillStyle = _this.tint.toCss();
                     context.fillRect(0, 0, size, size);
-                    // Apply diffference blending operation
+                    // Apply difference blending operation
                     context.globalCompositeOperation = "difference";
                 }
                 context.drawImage(image, 0, 0, size, size);
@@ -53,7 +56,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.property()
         ], TintLayer.prototype, "urlTemplate", void 0);
         __decorate([
-            decorators_1.property()
+            decorators_1.property({ type: Color })
         ], TintLayer.prototype, "tint", void 0);
         TintLayer = __decorate([
             decorators_1.subclass("esri.layers.TintLayer")
@@ -62,10 +65,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     }(decorators_1.declared(BaseTileLayer)));
     esriConfig.request.corsEnabledServers.push("http://tile.stamen.com");
     var stamenTintLayer = new TintLayer({
-        title: "Stamen Toner"
+        title: "Stamen Toner",
+        tint: "#004FBB",
+        urlTemplate: "http://tile.stamen.com/toner/{z}/{x}/{y}.png"
     });
-    stamenTintLayer.tint = new Color("#004FBB");
-    stamenTintLayer.urlTemplate = "http://tile.stamen.com/toner/{z}/{x}/{y}.png";
     var map = new Map({
         layers: [stamenTintLayer]
     });
