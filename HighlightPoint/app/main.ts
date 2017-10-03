@@ -3,6 +3,7 @@ import SceneView = require("esri/views/SceneView");
 import Color = require("esri/Color");
 import Graphic = require("esri/Graphic");
 import FeatureSet = require("esri/tasks/support/FeatureSet");
+import esri = __esri;
 
 const webscene = new WebScene({
     portalItem: {
@@ -21,10 +22,11 @@ const view = new SceneView({
 
 webscene.load().then(() => {
     // Get layer from scene view
-    const stationLayer = webscene.layers.getItemAt(1);
+    const stationLayer = webscene.layers.getItemAt(1) as esri.FeatureLayer;
     // highlight is set on the layerview so we need to detect
     // when the layer view is ready
     view.whenLayerView(stationLayer).then(lyrView => {
+
         const queryStations = stationLayer.createQuery();
         const filterButtons = document.querySelectorAll("button");
         let handler: any = null;
@@ -38,7 +40,8 @@ webscene.load().then(() => {
                     if (handler) {
                         handler.remove();
                     }
-                    handler = lyrView.highlight(feature.attributes["OBJECTID"]);
+                    const flayerView = lyrView as esri.FeatureLayerView;
+                    handler = flayerView.highlight(feature.attributes["OBJECTID"]);
 
                     view.goTo({
                         target: feature.geometry,

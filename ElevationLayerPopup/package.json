@@ -9,7 +9,9 @@
   "author": "Kelly Hutchins",
   "license": "ISC",
   "dependencies": {
-    "@types/arcgis-js-api": "^4.3.1",
     "@types/chart.js": "^2.4.6"
+  },
+  "devDependencies": {
+    "@types/arcgis-js-api": "^4.5.0"
   }
 }

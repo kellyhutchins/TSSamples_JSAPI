@@ -1,0 +1,27 @@
+html,
+body,
+#mainViewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+#akViewDiv {
+    padding: 0;
+    margin: 0;
+    height: 225px;
+    width: 300px;
+    background-color: white;
+    border: 1px solid black;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+#hiViewDiv {
+    padding: 0;
+    margin: 0;
+    height: 135px;
+    width: 200px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid black;
+}

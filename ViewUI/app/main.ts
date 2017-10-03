@@ -3,12 +3,12 @@ import SceneView = require("esri/views/SceneView");
 import Search = require("esri/widgets/Search");
 
 const map = new Map({
-    basemap: "dark-gray"
+    basemap: "dark-gray" as any
 });
 const view = new SceneView({
     map: map,
     container: "viewDiv",
-    center: [-106.45, 31.76],
+    center: [-106.45, 31.76] as any,
     zoom: 16
 });
 

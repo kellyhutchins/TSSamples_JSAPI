@@ -7,12 +7,12 @@ import WebTileLayer = require("esri/layers/WebTileLayer");
 import Collection = require("esri/core/Collection");
 
 const map = new EsriMap({
-    basemap: "streets"
+    basemap: "streets" as any
 });
 const view = new MapView({
     map: map,
     container: "viewDiv",
-    center: [-118.244, 34.052],
+    center: [-118.244, 34.052] as any,
     zoom: 12
 });
 

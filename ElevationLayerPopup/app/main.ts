@@ -146,8 +146,8 @@ function queryElevation(geometry: Polyline) {
             document.getElementById("chartDistance").innerHTML = Math.round(length) + " miles";
         });
         let ascent = 0, descent = 0, vals: number[] = [], labels: string[] = [];
-
-        response.geometry.paths.forEach((path: any) => {
+        const geom = response.geometry as Polyline;
+        geom.paths.forEach((path: any) => {
             for (var i = 1; i < path.length; i++) {
 
                 vals.push(Math.round((path[i][2] / 0.3048)));

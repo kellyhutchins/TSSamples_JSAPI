@@ -12,7 +12,7 @@ import LabelSymbol3D = require("esri/symbols/LabelSymbol3D");
 import LabelClass = require("esri/layers/support/LabelClass");
 
 const map = new Map({
-    basemap: "dark-gray"
+    basemap: "dark-gray" as any
 });
 // TODO sample sets zoom in camera to 5.8 but that property
 // isn't doc'd sent inquiry to team to ask about it 
@@ -20,7 +20,7 @@ const view = new SceneView({
     map: map,
     container: "viewDiv",
     camera: {
-        position: [-81.76, 16.77, 1932626],
+        position: [-81.76, 16.77, 1932626] as any,
         tilt: 40
     }
 });
@@ -65,14 +65,14 @@ const labelClass = new LabelClass({
     symbol: new LabelSymbol3D({
         symbolLayers: [new TextSymbol3DLayer({
             material: {
-                color: "#fff"
+                color: new Color("#fff")
             },
             size: 10
         })]
     }),
     labelPlacement: "above-right",
     labelExpressionInfo: {
-        value: "{CITY_NAME}"
+        expression: "$feature.CITY_NAME",
     }
 });
 

@@ -3,14 +3,14 @@ import SceneView = require("esri/views/SceneView");
 import ElevationLayer = require("esri/layers/ElevationLayer");
 
 const map = new Map({
-    basemap: "topo",
-    ground: "world-elevation"
+    basemap: "topo" as any,
+    ground: "world-elevation" as any
 });
 const view = new SceneView({
     container: "viewDiv",
     map: map,
     camera: {
-        position: [-121.83, 48.279, 1346],
+        position: [-121.83, 48.279, 1346] as any,
         heading: 300,
         tilt: 60
     }
