@@ -1,6 +1,6 @@
 # TSSamples_JSAPI
 
-Examples of JSAPI 4.x samples and demo apps converted to TypeScript.  Use npm install in the individual sample folder to install sample dependencies. 
+Examples of JSAPI 4.x samples and demo apps converted to TypeScript.  Use npm install in the individual sample folder to install sample dependencies. Note that this is a learning project and these converted samples may not all demonstrate best practices. 
 
 * [ArcadeExpression](https://kellyhutchins.github.io/TSSamples_JSAPI/ArcadeExpression/index.html): [Reference Arcade Expression](https://developers.arcgis.com/javascript/latest/sample-code/popuptemplate-arcade/index.html)
 * [Composite Views](https://kellyhutchins.github.io/TSSamples_JSAPI/CompositeViews/index.html): [Composite Views Sample](https://developers.arcgis.com/javascript/latest/sample-code/views-composite-views/index.html)
