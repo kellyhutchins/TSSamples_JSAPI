@@ -12,13 +12,13 @@ import BaseTileLayer = require("esri/layers/BaseTileLayer");
 
 import BaseTileLayerProperties = __esri.BaseTileLayerProperties;
 
-export interface TintLayerProperties extends BaseTileLayerProperties {
+interface TintLayerProperties extends BaseTileLayerProperties {
     urlTemplate: string;
     tint: string | Color;
 }
 
 @subclass("esri.layers.TintLayer")
-export class TintLayer extends declared(BaseTileLayer) {
+class TintLayer extends declared(BaseTileLayer) {
 
     constructor(params?: TintLayerProperties) {
         super();
@@ -63,3 +63,4 @@ export class TintLayer extends declared(BaseTileLayer) {
             });
     }
 }
+export = TintLayer;

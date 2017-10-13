@@ -6,7 +6,7 @@ import TintLayer = require("app/tintlayer");
 
 esriConfig.request.corsEnabledServers.push("http://tile.stamen.com");
 
-const stamenTintLayer = new TintLayer.TintLayer({
+const stamenTintLayer = new TintLayer({
   title: "Stamen Toner",
   tint: "#004FBB",
   urlTemplate: "http://tile.stamen.com/toner/{z}/{x}/{y}.png"
