@@ -1,6 +1,6 @@
 # TSSamples_JSAPI
 
-Examples of JSAPI 4.x samples and demo apps converted to TypeScript.  Use npm install in the individual sample folder to install sample dependencies. 
+Examples of JSAPI 4.x samples and demo apps converted to TypeScript.  Use npm install in the individual sample folder to install sample dependencies. Note that this is a learning project and these converted samples may not all demonstrate best practices. 
 
 * [ArcadeExpression](https://kellyhutchins.github.io/TSSamples_JSAPI/ArcadeExpression/index.html): [Reference Arcade Expression](https://developers.arcgis.com/javascript/latest/sample-code/popuptemplate-arcade/index.html)
 * [Composite Views](https://kellyhutchins.github.io/TSSamples_JSAPI/CompositeViews/index.html): [Composite Views Sample](https://developers.arcgis.com/javascript/latest/sample-code/views-composite-views/index.html)
@@ -20,6 +20,7 @@ Examples of JSAPI 4.x samples and demo apps converted to TypeScript.  Use npm in
 * [PrintVectorTiles](https://kellyhutchins.github.io/TSSamples_JSAPI/PrintVectorTiles/index.html): [Print Vector Tiles](https://developers.arcgis.com/javascript/latest/sample-code/widgets-print-vectortiles/index.html)
 * [SceneLayerPoints](https://kellyhutchins.github.io/TSSamples_JSAPI/SceneLayerPoints/index.html) : [Scene Layer with point geometries sample](https://developers.arcgis.com/javascript/latest/sample-code/layers-scenelayer-points/index.html)
 * [SceneElevationLayer](https://kellyhutchins.github.io/TSSamples_JSAPI/SceneElevationLayer/index.html): [Elevation layer](https://developers.arcgis.com/javascript/latest/sample-code/scene-elevationlayer/index.html)
+* [SketchGeometries](https://kellyhutchins.github.io/TSSamples_JSAPI/SketchGeometries/index.html): [Sketch Geometries Sample](https://developers.arcgis.com/javascript/latest/sample-code/sketch-geometries/index.html)
 * [Swap2d3d](https://kellyhutchins.github.io/TSSamples_JSAPI/Swap2d3d/index.html): [Swap 2d/3d](https://developers.arcgis.com/javascript/latest/sample-code/views-swap-2d-3d/index.html)
 * [ViewUi](https://kellyhutchins.github.io/TSSamples_JSAPI/ViewUI/index.html): [Simple UI](https://developers.arcgis.com/javascript/latest/sample-code/simple-ui/index.html)
 * [WMS](https://kellyhutchins.github.io/TSSamples_JSAPI/WMSLayer/index.html): [WMSLayer](https://developers.arcgis.com/javascript/latest/sample-code/layers-wms/index.html)
