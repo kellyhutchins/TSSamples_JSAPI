@@ -103,7 +103,7 @@ define(["esri/Map", "esri/WebScene", "esri/views/MapView", "esri/views/SceneView
             if (view && view.center) {
                 insetView.goTo({
                     center: view.center,
-                    scale: view.scale * 2 * Math.max(view.width / insetView.width, view.height / insetView.height)
+                    scale: view.scale * Math.max(view.width / insetView.width, view.height / insetView.height)
                 }).then(function () {
                     updateGraphic();
                 });
