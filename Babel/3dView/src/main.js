@@ -3,18 +3,21 @@ import WebScene from "esri/WebScene";
 import MapView from "esri/views/MapView";
 import SceneView from "esri/views/SceneView";
 
+
 import Home from "esri/widgets/Home";
 import FullScreen from "esri/widgets/Fullscreen";
 
 import Point from "esri/geometry/Point";
 import Graphic from "esri/Graphic";
 
+const map = new WebScene({
+    portalItem: {
+        id: "53ed0a887ec7409692a7d1c6ba0e6763"
+    },
+    ground: "world-elevation"
+});
 const view = new SceneView({
-    map: new WebScene({
-        portalItem: {
-            id: "91b46c2b162c48dba264b2190e1dbcff"
-        }
-    }),
+    map: map,
     container: "viewDiv"
 });
 
@@ -25,16 +28,13 @@ view.ui.add(homeBtn, "top-left");
 
 view.when(() => {
     /* Create an overview map and add it to the lower left corner 
-    when the scene view is modifie udpate overview map */
+    when the scene view is modified udpate overview map */
     const insetDiv = document.createElement("div");
     insetDiv.classList.add("inset-map");
     const insetView = new MapView({
-        map: new Map({
-            basemap: "topo-vector",
-            ground: "world-elevation"
-        }),
+        map: map,
         center: view.center,
-        scale: view.scale * 2 * Math.max(view.width / 250, view.height / 250),
+        scale: view.scale * 4 * Math.max(view.width / 250, view.height / 250),
         container: insetDiv,
         constraints: {
             rotationEnabled: false
@@ -58,8 +58,10 @@ view.when(() => {
     });
 
     function insetMapClicked(e) {
+
         // 2d map clicked - navigate to location on 3d map 
-        insetView.map.ground.queryElevation(e.mapPoint).then((result) => {
+        view.map.ground.queryElevation(e.mapPoint).then((result) => {
+            console.log("Let's go");
             view.goTo(result.geometry);
             updateGraphic();
         });

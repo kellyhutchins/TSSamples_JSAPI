@@ -23,12 +23,14 @@ define(["esri/Map", "esri/WebScene", "esri/views/MapView", "esri/views/SceneView
         };
     }
 
+    var map = new _WebScene2.default({
+        portalItem: {
+            id: "53ed0a887ec7409692a7d1c6ba0e6763"
+        },
+        ground: "world-elevation"
+    });
     var view = new _SceneView2.default({
-        map: new _WebScene2.default({
-            portalItem: {
-                id: "91b46c2b162c48dba264b2190e1dbcff"
-            }
-        }),
+        map: map,
         container: "viewDiv"
     });
 
@@ -39,16 +41,13 @@ define(["esri/Map", "esri/WebScene", "esri/views/MapView", "esri/views/SceneView
 
     view.when(function () {
         /* Create an overview map and add it to the lower left corner 
-        when the scene view is modifie udpate overview map */
+        when the scene view is modified udpate overview map */
         var insetDiv = document.createElement("div");
         insetDiv.classList.add("inset-map");
         var insetView = new _MapView2.default({
-            map: new _Map2.default({
-                basemap: "topo-vector",
-                ground: "world-elevation"
-            }),
+            map: map,
             center: view.center,
-            scale: view.scale * 2 * Math.max(view.width / 250, view.height / 250),
+            scale: view.scale * 4 * Math.max(view.width / 250, view.height / 250),
             container: insetDiv,
             constraints: {
                 rotationEnabled: false
@@ -71,8 +70,10 @@ define(["esri/Map", "esri/WebScene", "esri/views/MapView", "esri/views/SceneView
         });
 
         function insetMapClicked(e) {
+
             // 2d map clicked - navigate to location on 3d map 
-            insetView.map.ground.queryElevation(e.mapPoint).then(function (result) {
+            view.map.ground.queryElevation(e.mapPoint).then(function (result) {
+                console.log("Let's go");
                 view.goTo(result.geometry);
                 updateGraphic();
             });
