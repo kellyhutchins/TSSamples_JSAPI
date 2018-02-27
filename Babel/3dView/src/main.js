@@ -34,7 +34,7 @@ view.when(() => {
     const insetView = new MapView({
         map: map,
         center: view.center,
-        scale: view.scale * 4 * Math.max(view.width / 250, view.height / 250),
+        scale: view.scale * 2 * Math.max(view.width / 250, view.height / 250),
         container: insetDiv,
         constraints: {
             rotationEnabled: false
@@ -61,7 +61,6 @@ view.when(() => {
 
         // 2d map clicked - navigate to location on 3d map 
         view.map.ground.queryElevation(e.mapPoint).then((result) => {
-            console.log("Let's go");
             view.goTo(result.geometry);
             updateGraphic();
         });
@@ -79,7 +78,7 @@ view.when(() => {
                 text: "\ue688",
                 angle: view.camera.heading,
                 font: {
-                    size: 26,
+                    size: 22,
                     family: "CalciteWebCoreIcons"
                 }
             }

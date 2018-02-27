@@ -47,7 +47,7 @@ define(["esri/Map", "esri/WebScene", "esri/views/MapView", "esri/views/SceneView
         var insetView = new _MapView2.default({
             map: map,
             center: view.center,
-            scale: view.scale * 4 * Math.max(view.width / 250, view.height / 250),
+            scale: view.scale * 2 * Math.max(view.width / 250, view.height / 250),
             container: insetDiv,
             constraints: {
                 rotationEnabled: false
@@ -73,7 +73,6 @@ define(["esri/Map", "esri/WebScene", "esri/views/MapView", "esri/views/SceneView
 
             // 2d map clicked - navigate to location on 3d map 
             view.map.ground.queryElevation(e.mapPoint).then(function (result) {
-                console.log("Let's go");
                 view.goTo(result.geometry);
                 updateGraphic();
             });
@@ -91,7 +90,7 @@ define(["esri/Map", "esri/WebScene", "esri/views/MapView", "esri/views/SceneView
                     text: "\uE688",
                     angle: view.camera.heading,
                     font: {
-                        size: 26,
+                        size: 22,
                         family: "CalciteWebCoreIcons"
                     }
                 }
@@ -103,7 +102,7 @@ define(["esri/Map", "esri/WebScene", "esri/views/MapView", "esri/views/SceneView
             if (view && view.center) {
                 insetView.goTo({
                     center: view.center,
-                    scale: view.scale * Math.max(view.width / insetView.width, view.height / insetView.height)
+                    scale: view.scale * 2 * Math.max(view.width / insetView.width, view.height / insetView.height)
                 }).then(function () {
                     updateGraphic();
                 });
