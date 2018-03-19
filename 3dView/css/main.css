@@ -1,0 +1,24 @@
+html,
+body,
+#viewDiv {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.inset-map {
+    border: solid 1px #fff;
+    background: #fff;
+    -webkit-box-shadow: 1px 1px 5px 1px rgba(255, 255, 255, 0.65);
+    -moz-box-shadow: 1px 1px 5px 1px rgba(255, 255, 255, 0.65);
+    box-shadow: 1px 1px 5px 1px rgba(255, 255, 255, 0.65);
+    width: 250px;
+    height: 250px;
+}
+
+#viewDiv>div.esri-view-root>div.esri-ui>div.esri-ui-inner-container.esri-ui-corner-container>div.esri-ui-bottom-left.esri-ui-corner>div>div.esri-view-root>div.esri-view-surface>div>svg>g>path {
+    fill: rgb(255, 0, 0);
+    fill-opacity: .40;
+    stroke-width: 1;
+}
