@@ -20,7 +20,7 @@ import urlUtils = require("esri/core/urlUtils");
 import esri = __esri;
 
 // set web scene id via ?webscene url param 
-let websceneId = "79b3544f74e44a69bb280164e4744ce3";
+let websceneId = "0b55be5e34204e7391163913b42db249";
 let webmapId = null;
 const urlParams = urlUtils.urlToObject(document.location.toString());
 if (urlParams.query && urlParams.query.webscene) {
