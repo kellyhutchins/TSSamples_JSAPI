@@ -27,8 +27,8 @@ import i18n = require("dojo/i18n!./nls/resources");
 const CSS = {
   loading: "configurable-application--loading"
 };
-import { syncSetup, createInsetView, addInsetWidgets } from "./sceneUtils";
-
+//import { syncSetup, createInsetView, addInsetWidgets } from "./sceneUtils";
+import InsetMap from "./InsetMap";
 import {
   createMapFromItem,
   createView,
@@ -126,11 +126,9 @@ class SceneExample {
           map
         }).then(view => {
           view.when(async () => {
-            const insetView = (await createInsetView(
-              view as __esri.SceneView
-            )) as __esri.MapView;
-            addInsetWidgets(insetView, view as __esri.SceneView, this.base.config);
-            syncSetup(view as __esri.SceneView, insetView);
+            const insetMap = new InsetMap({ mainView: view, config: this.base.config });
+            insetMap.createInsetView();
+
           });
           findQuery(find, view).then(() => goToMarker(marker, view));
         })

@@ -28,18 +28,13 @@
     var dojoLocale = search.match(localeUrlParamRegex) ? RegExp.$1 : undefined;
     var config = {
         async: true,
-        has: { "esri-featurelayer-webgl": 1, "esri-promise-compatibility": 1 },
+        has: { "esri-featurelayer-webgl": 1, "esri-promise-compatibility": 1, "esri-promise-compatibility-deprecation-warnings": 1 },
         locale: dojoLocale,
         packages: [
             { name: "Application", location: distPath + "/app", main: "Main" },
             {
                 name: "ApplicationBase",
-                location: distPath + "/node_modules/@esri/application-base-js",
-                main: "ApplicationBase"
-            },
-            {
-                name: "TemplateApplicationBase",
-                location: templateAppPath + "/node_modules/@esri/application-base-js",
+                location: distPath + "/app/application-base-js",
                 main: "ApplicationBase"
             },
             { name: "config", location: distPath + "/config" }

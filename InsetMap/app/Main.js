@@ -62,7 +62,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define(["require", "exports", "./sceneUtils", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper"], function (require, exports, sceneUtils_1, itemUtils_1, domHelper_1) {
+define(["require", "exports", "./InsetMap", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper"], function (require, exports, InsetMap_1, itemUtils_1, domHelper_1) {
     "use strict";
     var CSS = {
         loading: "configurable-application--loading"
@@ -124,16 +124,11 @@ define(["require", "exports", "./sceneUtils", "ApplicationBase/support/itemUtils
                 itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
                     return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
                         view.when(function () { return __awaiter(_this, void 0, void 0, function () {
-                            var insetView;
+                            var insetMap;
                             return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: return [4 /*yield*/, sceneUtils_1.createInsetView(view)];
-                                    case 1:
-                                        insetView = (_a.sent());
-                                        sceneUtils_1.addInsetWidgets(insetView, view, this.base.config);
-                                        sceneUtils_1.syncSetup(view, insetView);
-                                        return [2 /*return*/];
-                                }
+                                insetMap = new InsetMap_1.default({ mainView: view, config: this.base.config });
+                                insetMap.createInsetView();
+                                return [2 /*return*/];
                             });
                         }); });
                         itemUtils_1.findQuery(find, view).then(function () { return itemUtils_1.goToMarker(marker, view); });
