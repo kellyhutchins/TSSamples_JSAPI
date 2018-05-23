@@ -79,18 +79,26 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             if (_this.config.locationColor) {
                 defaultSymbol.color = _this.config.locationColor;
             }
+            _this.mapId = _this.config.webmap || null;
             return _this;
         }
         InsetMap.prototype.createInsetView = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var insetDiv, inset, _a;
+                var insetDiv, mapProps, inset, _a;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
                             insetDiv = document.createElement("div");
                             insetDiv.classList.add("inset-map");
+                            mapProps = {};
+                            if (this.mapId) {
+                                mapProps.portalItem = { id: this.mapId };
+                            }
+                            else {
+                                mapProps.basemap = this.basemap;
+                            }
                             inset = itemUtils_1.createView({
-                                map: new WebMap({ basemap: this.basemap }),
+                                map: new WebMap(mapProps),
                                 extent: this.mainView.extent,
                                 scale: this.mainView.scale * scale * Math.max(this.mainView.width / width, this.mainView.height / height),
                                 container: insetDiv,
@@ -121,10 +129,18 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     // Inset so move to full 
                     _this.mainView.ui.remove(_this.insetView.container);
                     viewContainerNode.appendChild(_this.insetView.container);
+                    _this.insetView.zoom = _this.mainView.zoom;
+                    _this.insetView.center = _this.mainView.camera.position;
                 }
                 else {
                     // Full move to inset  
                     _this.mainView.ui.add(_this.insetView.container, _this.config.insetPosition);
+                    _this.insetView.goTo({
+                        target: _this.mainView.camera.position,
+                        scale: _this.mainView.scale *
+                            scale *
+                            Math.max(_this.mainView.width / _this.insetView.width, _this.mainView.height / _this.insetView.height)
+                    }, { animate: true });
                 }
                 expandButton.classList.toggle(expandOpen);
                 expandButton.classList.toggle(expandClose);
@@ -137,8 +153,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         InsetMap.prototype._syncViews = function () {
             var _this = this;
-            this.mainView.watch("extent", function () { return _this._updatePosition(true); });
-            this.mainView.watch("camera", function () { return _this._updatePosition(true); });
+            this.mainView.watch("extent", function () { return _this._updatePosition(); }); // true
+            this.mainView.watch("camera", function () { return _this._updatePosition(); }); // true
             this.insetView.on("immediate-click", function (e) { return __awaiter(_this, void 0, void 0, function () {
                 var result;
                 return __generator(this, function (_a) {
@@ -147,28 +163,29 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         case 1:
                             result = _a.sent();
                             this.mainView.goTo(result.geometry);
-                            this._updatePosition(false);
+                            this._updatePosition(); // false 
                             return [2 /*return*/];
                     }
                 });
             }); });
-            this._updatePosition(true);
+            this._updatePosition(); // true
         };
-        InsetMap.prototype._updatePosition = function (zoom) {
+        InsetMap.prototype._updatePosition = function () {
             this.insetView.graphics.removeAll();
             defaultSymbol.angle = this.mainView.camera.heading;
             this.insetView.graphics.add(new Graphic({
                 geometry: this.mainView.camera.position,
                 symbol: defaultSymbol
             }));
-            if (zoom) {
-                this.insetView.goTo({
-                    target: this.mainView.camera.position,
-                    scale: this.mainView.scale *
-                        scale *
-                        Math.max(this.mainView.width / this.insetView.width, this.mainView.height / this.insetView.height)
-                }, { animate: false });
-            }
+            //if (zoom) {
+            /* this.insetView.goTo({
+             target: this.mainView.camera.position,
+             scale:
+                 this.mainView.scale *
+                 scale *
+                 Math.max(this.mainView.width / this.insetView.width, this.mainView.height / this.insetView.height)
+         }, { animate: true });*/
+            // }
         };
         __decorate([
             decorators_1.property()
@@ -182,6 +199,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], InsetMap.prototype, "basemap", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InsetMap.prototype, "mapId", void 0);
         __decorate([
             decorators_1.property()
         ], InsetMap.prototype, "config", void 0);

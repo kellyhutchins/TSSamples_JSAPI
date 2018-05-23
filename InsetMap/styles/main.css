@@ -67,4 +67,5 @@ body {
   -moz-box-shadow: 1px 1px 5px 1px rgba(255, 255, 255, 0.65);
   box-shadow: 1px 1px 5px 1px rgba(255, 255, 255, 0.65);
   width: 250px;
-  height: 250px; }
+  height: 250px;
+  cursor: pointer; }
