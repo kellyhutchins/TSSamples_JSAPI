@@ -29,8 +29,42 @@ body {
   height: 100%;
 }
 
-.direction-horizontal {
+.direction-vertical {
   flex-direction: column;
+}
+
+.gutter {
+  background-color: #eee;
+  font-family: "CalciteWebCoreIcons";
+  font-size: 20px;
+}
+
+.gutter.gutter-horizontal {
+  /*background-image: url('../grips/vertical.png');*/
+  cursor: ew-resize;
+}
+
+.gutter.gutter-horizontal:before {
+  content: "\e604";
+  position: absolute;
+  top: 50%;
+}
+
+.gutter.gutter-vertical:before {
+  content: "\e603";
+  position: absolute;
+  left: 50%;
+}
+
+.gutter.gutter-vertical {
+  width: 100%;
+  /* background-image: url('../grips/horizontal.png');*/
+  cursor: ns-resize;
+}
+
+.split.split-horizontal,
+.gutter.gutter-horizontal {
+  height: 100%;
 }
 
 .configurable-application__view-container {
@@ -42,14 +76,20 @@ body {
   justify-content: center;
   align-items: center;
   align-content: center;
-  .esri-view {
-    width: 100%;
-    height: 100%;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-color: #fff;
-    background-image: url(../assets/loader-ie9.gif);
-  }
+}
+
+.esri-view {
+  width: 100%;
+  height: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: #fff;
+  background-image: url(../assets/loader-ie9.gif);
+}
+
+.container {
+  width: 100%;
+  height: 100%;
 }
 
 .configurable-application--loading {

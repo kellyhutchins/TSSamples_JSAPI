@@ -5,7 +5,7 @@
   "portalUrl": "https://www.arcgis.com",
   "insetPosition": "bottom-left",
   "controlPosition": "bottom-right",
-  "splitDirection": "horizontal",
+  "splitDirection": "vertical",
   "insetBasemap": null,
   "locationColor": "00FFFF",
   "home": true,

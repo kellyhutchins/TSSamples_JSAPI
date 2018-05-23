@@ -51,7 +51,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/WebMap", "esri/Graphic", "ApplicationBase/support/itemUtils", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, WebMap, Graphic, itemUtils_1, decorators_1) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/WebMap", "esri/Graphic", "ApplicationBase/support/itemUtils", "./splitMaps", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, WebMap, Graphic, itemUtils_1, splitMaps_1, decorators_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var expandOpen = "esri-icon-zoom-out-fixed";
@@ -88,7 +88,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
-                            insetDiv = document.createElement("div");
+                            insetDiv = document.getElementById("map2d");
                             insetDiv.classList.add("inset-map");
                             mapProps = {};
                             if (this.mapId) {
@@ -121,19 +121,37 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         InsetMap.prototype._addControls = function () {
             var _this = this;
+            var splitter = null;
+            var splitterOptions = {
+                minSize: 0,
+                gutterSize: 20
+            };
+            if (this.config.splitDirection === "vertical") {
+                // stack maps on top of each other 
+                splitterOptions.direction = "vertical";
+            }
+            else {
+                splitterOptions.sizes = [50, 50];
+            }
             var expandButton = document.createElement("button");
-            expandButton.classList.add("esri-widget-button", expandOpen);
+            expandButton.classList.add("esri-widget--button", expandOpen);
             var viewContainerNode = document.getElementById("viewContainer");
             expandButton.addEventListener("click", function () {
                 if (expandButton.classList.contains(expandOpen)) {
+                    console.log("Expand");
                     // Inset so move to full 
                     _this.mainView.ui.remove(_this.insetView.container);
                     viewContainerNode.appendChild(_this.insetView.container);
+                    splitter = splitMaps_1.default(["#map3d", "#map2d"], splitterOptions);
                     _this.insetView.zoom = _this.mainView.zoom;
                     _this.insetView.center = _this.mainView.camera.position;
                 }
                 else {
+                    console.log("Contract");
                     // Full move to inset  
+                    if (splitter) {
+                        splitter.destroy();
+                    }
                     _this.mainView.ui.add(_this.insetView.container, _this.config.insetPosition);
                     _this.insetView.goTo({
                         target: _this.mainView.camera.position,

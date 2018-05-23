@@ -101,39 +101,37 @@ class SceneExample {
       portalItem && portalItem.appProxies ? portalItem.appProxies : null;
 
     const viewContainerNode = document.getElementById("viewContainer");
-    if (this.base.config.splitDirection === "horizontal") {
-      viewContainerNode.classList.add("direction-horizontal");
+    if (this.base.config.splitDirection === "vertical") {
+      // vertical is maps stacked vertically. Horizontal is side by side
+      viewContainerNode.classList.add("direction-vertical");
     }
     const defaultViewProperties = getConfigViewProperties(config);
+    const item = firstItem;
 
-    validWebSceneItems.forEach(item => {
-      const viewNode = document.createElement("div");
-      viewContainerNode.appendChild(viewNode);
+    const container = {
+      container: document.getElementById("map3d")//viewNode
+    };
 
-      const container = {
-        container: viewNode
-      };
+    const viewProperties = {
+      ...defaultViewProperties,
+      ...container
+    };
 
-      const viewProperties = {
-        ...defaultViewProperties,
-        ...container
-      };
+    const { basemapUrl, basemapReferenceUrl } = config;
+    createMapFromItem({ item, appProxies }).then(map =>
+      createView({
+        ...viewProperties,
+        map
+      }).then(view => {
+        view.when(async () => {
+          const insetMap = new InsetMap({ mainView: view, config: this.base.config });
+          insetMap.createInsetView();
 
-      const { basemapUrl, basemapReferenceUrl } = config;
-      createMapFromItem({ item, appProxies }).then(map =>
-        createView({
-          ...viewProperties,
-          map
-        }).then(view => {
-          view.when(async () => {
-            const insetMap = new InsetMap({ mainView: view, config: this.base.config });
-            insetMap.createInsetView();
+        });
+        findQuery(find, view).then(() => goToMarker(marker, view));
+      })
+    );
 
-          });
-          findQuery(find, view).then(() => goToMarker(marker, view));
-        })
-      );
-    });
     document.body.classList.remove(CSS.loading);
   }
 }

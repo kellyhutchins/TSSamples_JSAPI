@@ -109,30 +109,28 @@ define(["require", "exports", "./InsetMap", "ApplicationBase/support/itemUtils",
             var portalItem = this.base.results.applicationItem.value;
             var appProxies = portalItem && portalItem.appProxies ? portalItem.appProxies : null;
             var viewContainerNode = document.getElementById("viewContainer");
-            if (this.base.config.splitDirection === "horizontal") {
-                viewContainerNode.classList.add("direction-horizontal");
+            if (this.base.config.splitDirection === "vertical") {
+                // vertical is maps stacked vertically. Horizontal is side by side
+                viewContainerNode.classList.add("direction-vertical");
             }
             var defaultViewProperties = itemUtils_1.getConfigViewProperties(config);
-            validWebSceneItems.forEach(function (item) {
-                var viewNode = document.createElement("div");
-                viewContainerNode.appendChild(viewNode);
-                var container = {
-                    container: viewNode
-                };
-                var viewProperties = __assign({}, defaultViewProperties, container);
-                var basemapUrl = config.basemapUrl, basemapReferenceUrl = config.basemapReferenceUrl;
-                itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
-                    return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
-                        view.when(function () { return __awaiter(_this, void 0, void 0, function () {
-                            var insetMap;
-                            return __generator(this, function (_a) {
-                                insetMap = new InsetMap_1.default({ mainView: view, config: this.base.config });
-                                insetMap.createInsetView();
-                                return [2 /*return*/];
-                            });
-                        }); });
-                        itemUtils_1.findQuery(find, view).then(function () { return itemUtils_1.goToMarker(marker, view); });
-                    });
+            var item = firstItem;
+            var container = {
+                container: document.getElementById("map3d") //viewNode
+            };
+            var viewProperties = __assign({}, defaultViewProperties, container);
+            var basemapUrl = config.basemapUrl, basemapReferenceUrl = config.basemapReferenceUrl;
+            itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
+                return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
+                    view.when(function () { return __awaiter(_this, void 0, void 0, function () {
+                        var insetMap;
+                        return __generator(this, function (_a) {
+                            insetMap = new InsetMap_1.default({ mainView: view, config: this.base.config });
+                            insetMap.createInsetView();
+                            return [2 /*return*/];
+                        });
+                    }); });
+                    itemUtils_1.findQuery(find, view).then(function () { return itemUtils_1.goToMarker(marker, view); });
                 });
             });
             document.body.classList.remove(CSS.loading);

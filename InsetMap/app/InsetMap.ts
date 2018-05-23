@@ -15,6 +15,8 @@ import { createView } from "ApplicationBase/support/itemUtils";
 import {
     ApplicationConfig
 } from "ApplicationBase/interfaces";
+import Split from "./splitMaps";
+
 import {
     aliasOf,
     declared,
@@ -62,7 +64,8 @@ class InsetMap extends declared(Accessor) {
     }
 
     async createInsetView() {
-        const insetDiv = document.createElement("div");
+
+        const insetDiv = document.getElementById("map2d");
         insetDiv.classList.add("inset-map");
         const mapProps: __esri.WebMapProperties = {};
         if (this.mapId) {
@@ -87,18 +90,35 @@ class InsetMap extends declared(Accessor) {
         this._addControls();
     }
     private _addControls() {
+        let splitter = null;
+        const splitterOptions: any = {
+            minSize: 0,
+            gutterSize: 20
+        };
+        if (this.config.splitDirection === "vertical") {
+            // stack maps on top of each other 
+            splitterOptions.direction = "vertical";
+        } else {
+            splitterOptions.sizes = [50, 50];
+        }
         const expandButton = document.createElement("button");
-        expandButton.classList.add("esri-widget-button", expandOpen);
+        expandButton.classList.add("esri-widget--button", expandOpen);
         const viewContainerNode = document.getElementById("viewContainer");
         expandButton.addEventListener("click", () => {
             if (expandButton.classList.contains(expandOpen)) {
+                console.log("Expand");
                 // Inset so move to full 
                 this.mainView.ui.remove(this.insetView.container);
                 viewContainerNode.appendChild(this.insetView.container);
+                splitter = Split(["#map3d", "#map2d"], splitterOptions);
                 this.insetView.zoom = this.mainView.zoom;
                 this.insetView.center = this.mainView.camera.position;
             } else {
+                console.log("Contract");
                 // Full move to inset  
+                if (splitter) {
+                    splitter.destroy();
+                }
                 this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
                 this.insetView.goTo({
                     target: this.mainView.camera.position,
