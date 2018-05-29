@@ -1,17 +1,24 @@
 {
   "appid": "",
-  "title": "",
+  "title": null,
+  "titleLink": null,
   "webscene": "default",
   "portalUrl": "https://www.arcgis.com",
   "insetPosition": "bottom-left",
   "controlPosition": "bottom-right",
   "splitDirection": "vertical",
   "insetBasemap": null,
+  "search": true,
   "locationColor": "00FFFF",
   "home": true,
   "oauthappid": "",
   "proxyUrl": "",
   "units": "",
+  "splash": false,
+  "splashOnStart": false,
+  "splashDesc": "Description goes here",
+  "splashTitle": "Splash screen title",
+  "splashButtonLabel": "Ok",
   "helperServices": {
     "geometry": {
       "url": null

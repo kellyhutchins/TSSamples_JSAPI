@@ -49,6 +49,9 @@ define(["require", "exports"], function (require, exports) {
     // Default options
     var defaultGutterFn = function (i, gutterDirection) {
         var gut = document.createElement('div');
+        gut.setAttribute("role", "separator");
+        gut.setAttribute("tabIndex", "0");
+        gut.setAttribute("aria-orientation", gutterDirection);
         gut.className = "gutter gutter-" + gutterDirection;
         return gut;
     };
@@ -172,6 +175,7 @@ define(["require", "exports"], function (require, exports) {
         // Both sizes are calculated from the initial parent percentage,
         // then the gutter size is subtracted.
         function adjust(offset) {
+            console.log("Adjust", offset);
             var a = elements[this.a];
             var b = elements[this.b];
             var percentage = a.size + b.size;
@@ -179,6 +183,7 @@ define(["require", "exports"], function (require, exports) {
             b.size = (percentage - ((offset / this.size) * percentage));
             setElementSize(a.element, a.size, this.aGutterSize);
             setElementSize(b.element, b.size, this.bGutterSize);
+            console.log("SIZES after adjust", a.size, b.size);
         }
         // drag, where all the magic happens. The logic is really quite simple:
         //
@@ -203,6 +208,7 @@ define(["require", "exports"], function (require, exports) {
             // Get the offset of the event from the first side of the
             // pair `this.start`. Supports touch events, but not multitouch, so only the first
             // finger `touches[0]` is counted.
+            var axis = e[clientAxis];
             if ('touches' in e) {
                 offset = e.touches[0][clientAxis] - this.start;
             }
@@ -279,6 +285,39 @@ define(["require", "exports"], function (require, exports) {
             self.gutter.style.cursor = '';
             self.parent.style.cursor = '';
             document.body.style.cursor = '';
+        }
+        function keyboardNav(key) {
+            // TODO add keyboard nav for horiz left/right arrows 
+            var rect = this.gutter.getBoundingClientRect();
+            calculateSizes.call(this);
+            if (this.direction === "vertical") {
+                if (key.code === "ArrowUp") {
+                    this.dragging = true;
+                    drag.call(this, { clientY: rect.top });
+                }
+                else if (key.code === "ArrowDown") {
+                    this.dragging = true;
+                    drag.call(this, { clientY: rect.bottom });
+                }
+                else {
+                    this.dragging = false;
+                }
+            }
+            else {
+                if (key.code === "ArrowRight") {
+                    this.dragging = true;
+                    console.log("right");
+                    drag.call(this, { clientAxis: rect.top });
+                }
+                else if (key.code === "ArrowLeft") {
+                    this.dragging = true;
+                    console.log("left");
+                    drag.call(this, { clientAxis: rect.top });
+                }
+                else {
+                    this.dragging = false;
+                }
+            }
         }
         // startDragging calls `calculateSizes` to store the inital size in the pair object.
         // It also adds event listeners for mouse/touch events,
@@ -394,6 +433,7 @@ define(["require", "exports"], function (require, exports) {
                     setGutterSize(gutterElement, gutterSize);
                     gutterElement[addEventListener]('mousedown', startDragging.bind(pair));
                     gutterElement[addEventListener]('touchstart', startDragging.bind(pair));
+                    gutterElement[addEventListener]('keydown', keyboardNav.bind(pair));
                     parent.insertBefore(gutterElement, element.element);
                     pair.gutter = gutterElement;
                 }

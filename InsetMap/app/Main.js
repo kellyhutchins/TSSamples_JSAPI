@@ -104,10 +104,32 @@ define(["require", "exports", "./InsetMap", "ApplicationBase/support/itemUtils",
                 console.error("Could not load an item to display");
                 return;
             }
-            config.title = !config.title ? itemUtils_1.getItemTitle(firstItem) : "";
+            config.title = !config.title ? itemUtils_1.getItemTitle(firstItem) : config.title;
             domHelper_1.setPageTitle(config.title);
+            if (config.titleLink) {
+                config.title = "<a href=\"" + config.titleLink + "\" >" + config.title + "</a>";
+            }
+            document.getElementById("title").innerHTML = config.title;
             var portalItem = this.base.results.applicationItem.value;
             var appProxies = portalItem && portalItem.appProxies ? portalItem.appProxies : null;
+            // Setup splash screen if enabled 
+            if (this.base.config.splash) {
+                calcite.init();
+                var splashButton = document.getElementById("splashButton");
+                splashButton.classList.remove("hide");
+                document.getElementById("splashContent").innerHTML = this.base.config.splashDesc;
+                document.getElementById("splashTitle").innerHTML = this.base.config.splashTitle;
+                document.getElementById("splashOkButton").innerHTML = this.base.config.splashButtonLabel;
+                if (this.base.config.splashOnStart) {
+                    // enable splash screen when app loads then 
+                    // set info in session storage when its closed 
+                    // so we don't open again this session. 
+                    if (!sessionStorage.getItem("disableSplash")) {
+                        calcite.bus.emit("modal:open", { id: "splash" });
+                    }
+                    sessionStorage.setItem("disableSplash", "true");
+                }
+            }
             var viewContainerNode = document.getElementById("viewContainer");
             if (this.base.config.splitDirection === "vertical") {
                 // vertical is maps stacked vertically. Horizontal is side by side
@@ -116,7 +138,7 @@ define(["require", "exports", "./InsetMap", "ApplicationBase/support/itemUtils",
             var defaultViewProperties = itemUtils_1.getConfigViewProperties(config);
             var item = firstItem;
             var container = {
-                container: document.getElementById("map3d") //viewNode
+                container: document.getElementById("mapMain") //viewNode
             };
             var viewProperties = __assign({}, defaultViewProperties, container);
             var basemapUrl = config.basemapUrl, basemapReferenceUrl = config.basemapReferenceUrl;
@@ -127,6 +149,10 @@ define(["require", "exports", "./InsetMap", "ApplicationBase/support/itemUtils",
                         return __generator(this, function (_a) {
                             insetMap = new InsetMap_1.default({ mainView: view, config: this.base.config });
                             insetMap.createInsetView();
+                            // Get inset view when ready 
+                            insetMap.watch("insetView", function () {
+                                var insetView = insetMap.insetView;
+                            });
                             return [2 /*return*/];
                         });
                     }); });

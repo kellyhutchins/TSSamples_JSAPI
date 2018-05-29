@@ -51,7 +51,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/WebMap", "esri/Graphic", "ApplicationBase/support/itemUtils", "./splitMaps", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, WebMap, Graphic, itemUtils_1, splitMaps_1, decorators_1) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/WebMap", "esri/Graphic", "esri/geometry/geometryEngineAsync", "ApplicationBase/support/itemUtils", "./splitMaps", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, WebMap, Graphic, geometryEngineAsync, itemUtils_1, splitMaps_1, decorators_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var expandOpen = "esri-icon-zoom-out-fixed";
@@ -88,8 +88,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
-                            insetDiv = document.getElementById("map2d");
-                            insetDiv.classList.add("inset-map");
+                            insetDiv = document.getElementById("mapInset");
                             mapProps = {};
                             if (this.mapId) {
                                 mapProps.portalItem = { id: this.mapId };
@@ -106,21 +105,33 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                                     rotationEnabled: false
                                 },
                                 ui: {
-                                    components: []
+                                //   components: []
                                 }
                             });
                             _a = this;
                             return [4 /*yield*/, inset.then()];
                         case 1:
                             _a.insetView = (_b.sent());
-                            this._addControls();
+                            insetDiv.classList.remove("hide");
+                            this._setupSync();
                             return [2 /*return*/];
                     }
                 });
             });
         };
-        InsetMap.prototype._addControls = function () {
+        InsetMap.prototype._setupSync = function () {
             var _this = this;
+            // TODO a11y for button (title)
+            var expandButton = document.createElement("button");
+            expandButton.classList.add("esri-widget-button", expandOpen);
+            expandButton.title = "Expand";
+            expandButton.setAttribute("aria-label", "Expand");
+            this.insetView.ui.add(expandButton, this.config.controlPosition);
+            this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
+            this.insetView.when(function () {
+                _this._syncViews();
+            });
+            var viewContainerNode = document.getElementById("viewContainer");
             var splitter = null;
             var splitterOptions = {
                 minSize: 0,
@@ -133,21 +144,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             else {
                 splitterOptions.sizes = [50, 50];
             }
-            var expandButton = document.createElement("button");
-            expandButton.classList.add("esri-widget--button", expandOpen);
-            var viewContainerNode = document.getElementById("viewContainer");
             expandButton.addEventListener("click", function () {
                 if (expandButton.classList.contains(expandOpen)) {
-                    console.log("Expand");
                     // Inset so move to full 
                     _this.mainView.ui.remove(_this.insetView.container);
                     viewContainerNode.appendChild(_this.insetView.container);
-                    splitter = splitMaps_1.default(["#map3d", "#map2d"], splitterOptions);
+                    splitter = splitMaps_1.default(["#mapMain", "#mapInset"], splitterOptions);
                     _this.insetView.zoom = _this.mainView.zoom;
                     _this.insetView.center = _this.mainView.camera.position;
                 }
                 else {
-                    console.log("Contract");
                     // Full move to inset  
                     if (splitter) {
                         splitter.destroy();
@@ -162,11 +168,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
                 expandButton.classList.toggle(expandOpen);
                 expandButton.classList.toggle(expandClose);
-            });
-            this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
-            this.insetView.ui.add(expandButton, this.config.controlPosition);
-            this.insetView.when(function () {
-                _this._syncViews();
             });
         };
         InsetMap.prototype._syncViews = function () {
@@ -189,12 +190,20 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this._updatePosition(); // true
         };
         InsetMap.prototype._updatePosition = function () {
+            var _this = this;
             this.insetView.graphics.removeAll();
+            var position = this.mainView.camera.position;
             defaultSymbol.angle = this.mainView.camera.heading;
             this.insetView.graphics.add(new Graphic({
-                geometry: this.mainView.camera.position,
+                geometry: position,
                 symbol: defaultSymbol
             }));
+            // Pan to graphic if it moves out of inset view 
+            geometryEngineAsync.contains(this.insetView.extent, position).then(function (contains) {
+                if (!contains) {
+                    _this.insetView.goTo(position);
+                }
+            });
             //if (zoom) {
             /* this.insetView.goTo({
              target: this.mainView.camera.position,

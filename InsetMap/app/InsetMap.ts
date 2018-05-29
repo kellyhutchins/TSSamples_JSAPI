@@ -11,6 +11,8 @@ import MapView = require("esri/views/MapView");
 import SceneView = require("esri/views/SceneView");
 import Graphic = require("esri/Graphic");
 
+import geometryEngineAsync = require("esri/geometry/geometryEngineAsync");
+
 import { createView } from "ApplicationBase/support/itemUtils";
 import {
     ApplicationConfig
@@ -65,8 +67,7 @@ class InsetMap extends declared(Accessor) {
 
     async createInsetView() {
 
-        const insetDiv = document.getElementById("map2d");
-        insetDiv.classList.add("inset-map");
+        const insetDiv = document.getElementById("mapInset");
         const mapProps: __esri.WebMapProperties = {};
         if (this.mapId) {
             mapProps.portalItem = { id: this.mapId };
@@ -82,14 +83,27 @@ class InsetMap extends declared(Accessor) {
                 rotationEnabled: false
             },
             ui: {
-                components: []
+                //   components: []
             }
         });
-        this.insetView = await inset.then() as MapView;
 
-        this._addControls();
+        this.insetView = await inset.then() as MapView;
+        insetDiv.classList.remove("hide");
+        this._setupSync();
     }
-    private _addControls() {
+    private _setupSync() {
+        // TODO a11y for button (title)
+        const expandButton = document.createElement("button");
+        expandButton.classList.add("esri-widget-button", expandOpen);
+        expandButton.title = "Expand";
+        expandButton.setAttribute("aria-label", "Expand");
+
+        this.insetView.ui.add(expandButton, this.config.controlPosition);
+        this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
+        this.insetView.when(() => {
+            this._syncViews();
+        });
+        const viewContainerNode = document.getElementById("viewContainer");
         let splitter = null;
         const splitterOptions: any = {
             minSize: 0,
@@ -101,20 +115,15 @@ class InsetMap extends declared(Accessor) {
         } else {
             splitterOptions.sizes = [50, 50];
         }
-        const expandButton = document.createElement("button");
-        expandButton.classList.add("esri-widget--button", expandOpen);
-        const viewContainerNode = document.getElementById("viewContainer");
         expandButton.addEventListener("click", () => {
             if (expandButton.classList.contains(expandOpen)) {
-                console.log("Expand");
                 // Inset so move to full 
                 this.mainView.ui.remove(this.insetView.container);
                 viewContainerNode.appendChild(this.insetView.container);
-                splitter = Split(["#map3d", "#map2d"], splitterOptions);
+                splitter = Split(["#mapMain", "#mapInset"], splitterOptions);
                 this.insetView.zoom = this.mainView.zoom;
                 this.insetView.center = this.mainView.camera.position;
             } else {
-                console.log("Contract");
                 // Full move to inset  
                 if (splitter) {
                     splitter.destroy();
@@ -132,12 +141,7 @@ class InsetMap extends declared(Accessor) {
             expandButton.classList.toggle(expandClose);
 
         });
-        this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
-        this.insetView.ui.add(expandButton, this.config.controlPosition);
 
-        this.insetView.when(() => {
-            this._syncViews();
-        });
     }
 
     private _syncViews() {
@@ -153,11 +157,19 @@ class InsetMap extends declared(Accessor) {
     }
     private _updatePosition() {
         this.insetView.graphics.removeAll();
+        const position = this.mainView.camera.position;
         defaultSymbol.angle = this.mainView.camera.heading;
         this.insetView.graphics.add(new Graphic({
-            geometry: this.mainView.camera.position,
+            geometry: position,
             symbol: defaultSymbol
         }));
+
+        // Pan to graphic if it moves out of inset view 
+        geometryEngineAsync.contains(this.insetView.extent, position).then((contains) => {
+            if (!contains) {
+                this.insetView.goTo(position);
+            }
+        });
 
         //if (zoom) {
 

@@ -12,6 +12,10 @@
   <link rel=icon href=assets/favicon.ico sizes="32x32" type="image/vnd.microsoft.icon">
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+  <script src="https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.0.1/js/calcite-web.min.js"></script>
+  <!--<script>
+    calcite.init();
+  </script>-->
   <script src="./app/dojo.js"></script>
   <script src="https://js.arcgis.com/4.7/"></script>
   <script>
@@ -20,9 +24,43 @@
 </head>
 
 <body class="configurable-application--loading">
+  <header class="top-nav fade-in">
+    <div class="grid-container">
+      <div class="column-24">
+        <div>
+          <a class="skip-to-content" href="#skip-to-content">Skip To Content</a>
+          <div class="top-nav-title">
+            <span id="title"></span>
+          </div>
+          <div class="class-top-nav-list right">
+            <button id="splashButton" data-modal="splash" class="hide js-modal-toggle search-top-nav icon-ui-flush link-dark-gray" aria-label="About">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" class="svg-icon">
+                <path d="M31.297 16.047c0 8.428-6.826 15.25-15.25 15.25S.797 24.475.797 16.047c0-8.424 6.826-15.25 15.25-15.25s15.25 6.826 15.25 15.25zM18 24V12h-4v12h-2v2h8v-2h-2zm0-18h-4v4h4V6z"
+                />
+              </svg>
+              About
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
   <div id="viewContainer" class="configurable-application__view-container">
-    <div id="map3d" class="container"></div>
-    <div id="map2d" class="container"></div>
+    <div id="mapMain" class="container"></div>
+    <div id="mapInset" class="container inset-map hide"></div>
+  </div>
+
+  <!-- Splash/Description Modal -->
+  <div class="js-modal modal-overlay modifier-class" data-modal="splash">
+    <div class="modal-content column-12" role="dialog" aria-labelledby="modal" role="dialog">
+      <h3 class='trailer-half' id="splashTitle"></h3>
+      <p id="splashContent"></p>
+      <div class="text-right">
+        <button id="splashOkButton" class="btn js-modal-toggle">okay</button>
+      </div>
+    </div>
   </div>
 </body>
 

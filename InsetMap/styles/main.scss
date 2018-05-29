@@ -20,7 +20,7 @@
   limitations under the License.​
 */
 
-//@import "../../node_modules/calcite-web/dist/sass/calcite-web";
+@import "./node_modules/calcite-web/dist/sass/calcite-web";
 html,
 body {
   margin: 0;
@@ -29,18 +29,29 @@ body {
   height: 100%;
 }
 
+.hide {
+  display: none;
+}
+
 .direction-vertical {
   flex-direction: column;
 }
 
 .gutter {
-  background-color: #eee;
+  background-color: hsla(0, 0%, 92%, .8);
+  color: #656565;
   font-family: "CalciteWebCoreIcons";
-  font-size: 20px;
+  font-size: 15px;
+  font-weight: bolder;
+}
+
+.gutter:active,
+.gutter:focus {
+  background-color: #656565;
+  color: hsla(0, 0%, 92%, .8);
 }
 
 .gutter.gutter-horizontal {
-  /*background-image: url('../grips/vertical.png');*/
   cursor: ew-resize;
 }
 
@@ -58,7 +69,6 @@ body {
 
 .gutter.gutter-vertical {
   width: 100%;
-  /* background-image: url('../grips/horizontal.png');*/
   cursor: ns-resize;
 }
 

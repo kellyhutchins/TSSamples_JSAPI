@@ -27,7 +27,7 @@ import i18n = require("dojo/i18n!./nls/resources");
 const CSS = {
   loading: "configurable-application--loading"
 };
-//import { syncSetup, createInsetView, addInsetWidgets } from "./sceneUtils";
+
 import InsetMap from "./InsetMap";
 import {
   createMapFromItem,
@@ -49,7 +49,7 @@ import {
   ApplicationConfig,
   ApplicationBaseSettings
 } from "ApplicationBase/interfaces";
-
+declare var calcite: any;
 class SceneExample {
   //--------------------------------------------------------------------------
   //
@@ -93,12 +93,39 @@ class SceneExample {
       return;
     }
 
-    config.title = !config.title ? getItemTitle(firstItem) : "";
+    config.title = !config.title ? getItemTitle(firstItem) : config.title;
     setPageTitle(config.title);
 
+
+    if (config.titleLink) {
+      config.title = `<a href="${config.titleLink}" >${config.title}</a>`;
+    }
+
+    document.getElementById("title").innerHTML = config.title;
     const portalItem: any = this.base.results.applicationItem.value;
     const appProxies =
       portalItem && portalItem.appProxies ? portalItem.appProxies : null;
+
+    // Setup splash screen if enabled 
+    if (this.base.config.splash) {
+      calcite.init();
+      const splashButton = document.getElementById("splashButton");
+      splashButton.classList.remove("hide");
+
+      document.getElementById("splashContent").innerHTML = this.base.config.splashDesc;
+      document.getElementById("splashTitle").innerHTML = this.base.config.splashTitle;
+      document.getElementById("splashOkButton").innerHTML = this.base.config.splashButtonLabel;
+
+      if (this.base.config.splashOnStart) {
+        // enable splash screen when app loads then 
+        // set info in session storage when its closed 
+        // so we don't open again this session. 
+        if (!sessionStorage.getItem("disableSplash")) {
+          calcite.bus.emit("modal:open", { id: "splash" });
+        }
+        sessionStorage.setItem("disableSplash", "true");
+      }
+    }
 
     const viewContainerNode = document.getElementById("viewContainer");
     if (this.base.config.splitDirection === "vertical") {
@@ -109,7 +136,7 @@ class SceneExample {
     const item = firstItem;
 
     const container = {
-      container: document.getElementById("map3d")//viewNode
+      container: document.getElementById("mapMain")//viewNode
     };
 
     const viewProperties = {
@@ -126,7 +153,10 @@ class SceneExample {
         view.when(async () => {
           const insetMap = new InsetMap({ mainView: view, config: this.base.config });
           insetMap.createInsetView();
-
+          // Get inset view when ready 
+          insetMap.watch("insetView", () => {
+            const insetView = insetMap.insetView;
+          })
         });
         findQuery(find, view).then(() => goToMarker(marker, view));
       })

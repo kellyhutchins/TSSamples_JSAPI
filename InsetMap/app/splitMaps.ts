@@ -38,7 +38,6 @@ const elementOrSelector = el => {
     if (isString(el)) {
         return document.querySelector(el)
     }
-
     return el
 }
 
@@ -53,8 +52,12 @@ const getOption = (options, propName, def) => {
 
 // Default options
 const defaultGutterFn = (i, gutterDirection) => {
-    const gut = document.createElement('div')
+    const gut = document.createElement('div');
+    gut.setAttribute("role", "separator");
+    gut.setAttribute("tabIndex", "0");
+    gut.setAttribute("aria-orientation", gutterDirection);
     gut.className = `gutter gutter-${gutterDirection}`
+
     return gut
 }
 
@@ -132,6 +135,7 @@ const Split = (ids, options = {}) => {
     const elementStyle = getOption(options, 'elementStyle', defaultElementStyleFn)
     const gutterStyle = getOption(options, 'gutterStyle', defaultGutterStyleFn)
 
+
     // 2. Initialize a bunch of strings based on the direction we're splitting.
     // A lot of the behavior in the rest of the library is paramatized down to
     // rely on CSS strings and classes.
@@ -185,6 +189,7 @@ const Split = (ids, options = {}) => {
     // Both sizes are calculated from the initial parent percentage,
     // then the gutter size is subtracted.
     function adjust(offset) {
+        console.log("Adjust", offset);
         const a = elements[this.a]
         const b = elements[this.b]
         const percentage = a.size + b.size
@@ -194,6 +199,7 @@ const Split = (ids, options = {}) => {
 
         setElementSize(a.element, a.size, this.aGutterSize)
         setElementSize(b.element, b.size, this.bGutterSize)
+        console.log("SIZES after adjust", a.size, b.size);
     }
 
     // drag, where all the magic happens. The logic is really quite simple:
@@ -211,6 +217,7 @@ const Split = (ids, options = {}) => {
     // ---------------------------------------------------------------------
     // | <- this.start                                        this.size -> |
     function drag(e) {
+
         let offset
         const a = elements[this.a]
         const b = elements[this.b]
@@ -220,6 +227,7 @@ const Split = (ids, options = {}) => {
         // Get the offset of the event from the first side of the
         // pair `this.start`. Supports touch events, but not multitouch, so only the first
         // finger `touches[0]` is counted.
+        const axis = e[clientAxis];
         if ('touches' in e) {
             offset = e.touches[0][clientAxis] - this.start
         } else {
@@ -310,7 +318,38 @@ const Split = (ids, options = {}) => {
         self.parent.style.cursor = ''
         document.body.style.cursor = ''
     }
+    function keyboardNav(key) {
 
+        // TODO add keyboard nav for horiz left/right arrows 
+        const rect = this.gutter.getBoundingClientRect();
+
+        calculateSizes.call(this);
+        if (this.direction === "vertical") {
+
+            if (key.code === "ArrowUp") {
+                this.dragging = true;
+                drag.call(this, { clientY: rect.top });
+            } else if (key.code === "ArrowDown") {
+                this.dragging = true;
+                drag.call(this, { clientY: rect.bottom });
+            } else {
+                this.dragging = false;
+            }
+        } else {
+
+            if (key.code === "ArrowRight") {
+                this.dragging = true;
+                console.log("right");
+                drag.call(this, { clientAxis: rect.top });
+            } else if (key.code === "ArrowLeft") {
+                this.dragging = true;
+                console.log("left");
+                drag.call(this, { clientAxis: rect.top });
+            } else {
+                this.dragging = false;
+            }
+        }
+    }
     // startDragging calls `calculateSizes` to store the inital size in the pair object.
     // It also adds event listeners for mouse/touch events,
     // and prevents selection while dragging so avoid the selecting text.
@@ -444,7 +483,7 @@ const Split = (ids, options = {}) => {
 
                 gutterElement[addEventListener]('mousedown', startDragging.bind(pair))
                 gutterElement[addEventListener]('touchstart', startDragging.bind(pair))
-
+                gutterElement[addEventListener]('keydown', keyboardNav.bind(pair));
                 parent.insertBefore(gutterElement, element.element)
 
                 pair.gutter = gutterElement
