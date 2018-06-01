@@ -1,6 +1,6 @@
 {
   "environment": {
-    "isEsri": false,
+    "isEsri": true,
     "webTierSecurity": false
   },
   "localStorage": {
@@ -13,6 +13,7 @@
     "appid",
     "basemapUrl",
     "basemapReferenceUrl",
+    "measurement",
     "center",
     "components",
     "embed",
@@ -37,7 +38,7 @@
     "fetch": false
   },
   "webScene": {
-    "default": "0b55be5e34204e7391163913b42db249",
+    "default": "7dec3ae8723e4b39ac79cfabbd7b674e",
     "fetch": true
   }
 }

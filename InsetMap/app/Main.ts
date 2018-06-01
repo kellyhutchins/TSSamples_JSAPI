@@ -29,6 +29,7 @@ const CSS = {
 };
 
 import InsetMap from "./InsetMap";
+import requireUtils = require("esri/core/requireUtils");
 import {
   createMapFromItem,
   createView,
@@ -159,10 +160,107 @@ class SceneExample {
           })
         });
         findQuery(find, view).then(() => goToMarker(marker, view));
+        this._addMeasureWidgets(view, this.base.config);
       })
     );
 
     document.body.classList.remove(CSS.loading);
+  }
+
+  async _addMeasureWidgets(view, config) {
+    if (config.measurement) {
+      const measureRequire = await requireUtils.when(require, [
+        "esri/widgets/DirectLineMeasurement3D", "esri/widgets/AreaMeasurement3D"
+      ]);
+      if (measureRequire && measureRequire.length && measureRequire.length > 1) {
+        const DirectLineMeasurement3D = measureRequire[0];
+        const AreaMeasurement3D = measureRequire[1];
+
+        const nav = document.createElement("nav");
+        nav.classList.add("leader-1")
+
+        let measureTool = null;
+        let type;
+        nav.appendChild(this._createMeasureButton("area"));
+        nav.appendChild(this._createMeasureButton("line"));
+        nav.addEventListener("click", (e) => {
+          const button = e.target as HTMLButtonElement
+
+          if (measureTool) {
+            measureTool.destroy();
+            view.ui.remove(measureTool);
+          }
+          // don't recreate if its the same button 
+          if (type && type === button.dataset.type) {
+            type = null;
+          } else {
+            type = button.dataset.type;
+            if (type === "area") {
+              measureTool = new AreaMeasurement3D({
+                view
+              });
+            } else {
+              measureTool = new DirectLineMeasurement3D({
+                view
+              });
+            }
+            view.ui.add(measureTool, config.measurementPosition);
+          }
+
+        });
+        /* const areaButton = document.createElement("button");
+         areaButton.classList.add("esri-widget-button", "btn", "btn-grouped", "esri-icon-polygon");
+         areaButton.title = i18n.tools.measureArea;
+         areaButton.setAttribute("aria-label", i18n.tools.measureArea);
+         areaButton.addEventListener("click", () => {
+           if (measureTool) {
+             measureTool.destroy();
+             view.ui.remove(measureTool);
+           }
+           measureTool = new AreaMeasurement3D({
+             view: view
+           });
+           view.ui.add(measureTool, config.measurementPosition);
+         });
+         nav.appendChild(areaButton);
+         const lineButton = document.createElement("button");
+         lineButton.classList.add("esri-widget-button", "btn", "btn-grouped", "esri-icon-polyline");
+         lineButton.title = i18n.tools.measureLine;
+         lineButton.setAttribute("aria-label", i18n.tools.measureLine);
+         lineButton.addEventListener("click", () => {
+           if (measureTool) {
+             measureTool.destroy();
+             view.ui.remove(measureTool);
+           }
+           measureTool = new DirectLineMeasurement3D({
+             view: view
+           });
+           view.ui.add(measureTool, config.measurementPosition);
+         });
+         nav.appendChild(lineButton);*/
+        view.ui.add(nav, config.measurementPosition);
+
+
+
+      }
+
+
+
+
+
+
+    }
+  }
+  _createMeasureButton(type) {
+    const button = document.createElement("button");
+    const icon = type === "area" ? "esri-icon-polygon" : "esri-icon-polyline";
+    const label = type === "area" ? i18n.tools.measureArea : i18n.tools.measureLine;
+    button.dataset.type = type;
+    button.classList.add("esri-widget-button", "btn", "btn-grouped", icon);
+    button.title = label;
+
+    button.setAttribute("aria-label", label);
+    return button;
   }
 }
 

@@ -59,16 +59,30 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     var scale = 4;
     var width = 250;
     var height = 250;
-    var defaultSymbol = {
+    var defaultDirectionSymbol = {
+        type: "picture-marker",
+        url: "assets/viewpoint.png",
+        width: 60,
+        height: 40,
+        angle: 0
+    };
+    /*const defaultLocationSymbol = {
+        type: "simple-marker",
+        style: "path",
+        path: "M23.3 36.98L46.56 8c-.9-.68-9.85-8-23.28-8S.9 7.32 0 8l23.26 28.98.02.02.02-.02z",
+        size: 20,
+        color: [71, 71, 71, 0.25]
+    }*/
+    /*const defaultDirectionSymbol = {
         type: "text",
-        color: "#FFFF00",
-        text: "\ue688",
+        color: "#333",
+        text: "\ue666",
         angle: 0,
         font: {
-            size: 22,
+            size: 14,
             family: "CalciteWebCoreIcons"
         }
-    };
+    };*/
     var InsetMap = /** @class */ (function (_super) {
         __extends(InsetMap, _super);
         function InsetMap(params) {
@@ -77,7 +91,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.config = params.config;
             _this.basemap = _this.config.insetBasemap || _this.mainView.map.basemap;
             if (_this.config.locationColor) {
-                defaultSymbol.color = _this.config.locationColor;
+                //  defaultDirectionSymbol.color = this.config.locationColor;
             }
             _this.mapId = _this.config.webmap || null;
             return _this;
@@ -105,7 +119,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                                     rotationEnabled: false
                                 },
                                 ui: {
-                                //   components: []
+                                    components: []
                                 }
                             });
                             _a = this;
@@ -123,13 +137,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var _this = this;
             // TODO a11y for button (title)
             var expandButton = document.createElement("button");
-            expandButton.classList.add("esri-widget-button", expandOpen);
+            expandButton.classList.add("esri-widget--button", expandOpen);
             expandButton.title = "Expand";
             expandButton.setAttribute("aria-label", "Expand");
             this.insetView.ui.add(expandButton, this.config.controlPosition);
             this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
             this.insetView.when(function () {
                 _this._syncViews();
+                _this.insetView.goTo({ target: _this.mainView.center });
             });
             var viewContainerNode = document.getElementById("viewContainer");
             var splitter = null;
@@ -169,11 +184,15 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 expandButton.classList.toggle(expandOpen);
                 expandButton.classList.toggle(expandClose);
             });
+            // Start with inset map expanded
+            if (this.config.insetExpand) {
+                expandButton.click();
+            }
         };
         InsetMap.prototype._syncViews = function () {
             var _this = this;
-            this.mainView.watch("extent", function () { return _this._updatePosition(); }); // true
-            this.mainView.watch("camera", function () { return _this._updatePosition(); }); // true
+            this.mainView.watch("extent", function () { return _this._updatePosition(); });
+            this.mainView.watch("camera", function () { return _this._updatePosition(); });
             this.insetView.on("immediate-click", function (e) { return __awaiter(_this, void 0, void 0, function () {
                 var result;
                 return __generator(this, function (_a) {
@@ -181,22 +200,23 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         case 0: return [4 /*yield*/, this.mainView.map.ground.queryElevation(e.mapPoint)];
                         case 1:
                             result = _a.sent();
-                            this.mainView.goTo(result.geometry);
-                            this._updatePosition(); // false 
+                            this.mainView.goTo({
+                                target: result.geometry
+                            });
+                            this._updatePosition();
                             return [2 /*return*/];
                     }
                 });
             }); });
-            this._updatePosition(); // true
         };
         InsetMap.prototype._updatePosition = function () {
             var _this = this;
             this.insetView.graphics.removeAll();
             var position = this.mainView.camera.position;
-            defaultSymbol.angle = this.mainView.camera.heading;
+            defaultDirectionSymbol.angle = this.mainView.camera.heading;
             this.insetView.graphics.add(new Graphic({
                 geometry: position,
-                symbol: defaultSymbol
+                symbol: defaultDirectionSymbol
             }));
             // Pan to graphic if it moves out of inset view 
             geometryEngineAsync.contains(this.insetView.extent, position).then(function (contains) {
@@ -204,15 +224,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     _this.insetView.goTo(position);
                 }
             });
-            //if (zoom) {
-            /* this.insetView.goTo({
-             target: this.mainView.camera.position,
-             scale:
-                 this.mainView.scale *
-                 scale *
-                 Math.max(this.mainView.width / this.insetView.width, this.mainView.height / this.insetView.height)
-         }, { animate: true });*/
-            // }
         };
         __decorate([
             decorators_1.property()

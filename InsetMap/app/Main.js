@@ -62,7 +62,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define(["require", "exports", "./InsetMap", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper"], function (require, exports, InsetMap_1, itemUtils_1, domHelper_1) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "./InsetMap", "esri/core/requireUtils", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper"], function (require, exports, i18n, InsetMap_1, requireUtils, itemUtils_1, domHelper_1) {
     "use strict";
     var CSS = {
         loading: "configurable-application--loading"
@@ -157,9 +157,103 @@ define(["require", "exports", "./InsetMap", "ApplicationBase/support/itemUtils",
                         });
                     }); });
                     itemUtils_1.findQuery(find, view).then(function () { return itemUtils_1.goToMarker(marker, view); });
+                    _this._addMeasureWidgets(view, _this.base.config);
                 });
             });
             document.body.classList.remove(CSS.loading);
+        };
+        SceneExample.prototype._addMeasureWidgets = function (view, config) {
+            return __awaiter(this, void 0, void 0, function () {
+                var measureRequire, DirectLineMeasurement3D_1, AreaMeasurement3D_1, nav, measureTool_1, type_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!config.measurement) return [3 /*break*/, 2];
+                            return [4 /*yield*/, requireUtils.when(require, [
+                                    "esri/widgets/DirectLineMeasurement3D", "esri/widgets/AreaMeasurement3D"
+                                ])];
+                        case 1:
+                            measureRequire = _a.sent();
+                            if (measureRequire && measureRequire.length && measureRequire.length > 1) {
+                                DirectLineMeasurement3D_1 = measureRequire[0];
+                                AreaMeasurement3D_1 = measureRequire[1];
+                                nav = document.createElement("nav");
+                                nav.classList.add("leader-1");
+                                measureTool_1 = null;
+                                nav.appendChild(this._createMeasureButton("area"));
+                                nav.appendChild(this._createMeasureButton("line"));
+                                nav.addEventListener("click", function (e) {
+                                    var button = e.target;
+                                    if (measureTool_1) {
+                                        measureTool_1.destroy();
+                                        view.ui.remove(measureTool_1);
+                                    }
+                                    // don't recreate if its the same button 
+                                    if (type_1 && type_1 === button.dataset.type) {
+                                        type_1 = null;
+                                    }
+                                    else {
+                                        type_1 = button.dataset.type;
+                                        if (type_1 === "area") {
+                                            measureTool_1 = new AreaMeasurement3D_1({
+                                                view: view
+                                            });
+                                        }
+                                        else {
+                                            measureTool_1 = new DirectLineMeasurement3D_1({
+                                                view: view
+                                            });
+                                        }
+                                        view.ui.add(measureTool_1, config.measurementPosition);
+                                    }
+                                });
+                                /* const areaButton = document.createElement("button");
+                                 areaButton.classList.add("esri-widget-button", "btn", "btn-grouped", "esri-icon-polygon");
+                                 areaButton.title = i18n.tools.measureArea;
+                                 areaButton.setAttribute("aria-label", i18n.tools.measureArea);
+                                 areaButton.addEventListener("click", () => {
+                                   if (measureTool) {
+                                     measureTool.destroy();
+                                     view.ui.remove(measureTool);
+                                   }
+                                   measureTool = new AreaMeasurement3D({
+                                     view: view
+                                   });
+                                   view.ui.add(measureTool, config.measurementPosition);
+                                 });
+                                 nav.appendChild(areaButton);
+                                 const lineButton = document.createElement("button");
+                                 lineButton.classList.add("esri-widget-button", "btn", "btn-grouped", "esri-icon-polyline");
+                                 lineButton.title = i18n.tools.measureLine;
+                                 lineButton.setAttribute("aria-label", i18n.tools.measureLine);
+                                 lineButton.addEventListener("click", () => {
+                                   if (measureTool) {
+                                     measureTool.destroy();
+                                     view.ui.remove(measureTool);
+                                   }
+                                   measureTool = new DirectLineMeasurement3D({
+                                     view: view
+                                   });
+                                   view.ui.add(measureTool, config.measurementPosition);
+                                 });
+                                 nav.appendChild(lineButton);*/
+                                view.ui.add(nav, config.measurementPosition);
+                            }
+                            _a.label = 2;
+                        case 2: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        SceneExample.prototype._createMeasureButton = function (type) {
+            var button = document.createElement("button");
+            var icon = type === "area" ? "esri-icon-polygon" : "esri-icon-polyline";
+            var label = type === "area" ? i18n.tools.measureArea : i18n.tools.measureLine;
+            button.dataset.type = type;
+            button.classList.add("esri-widget-button", "btn", "btn-grouped", icon);
+            button.title = label;
+            button.setAttribute("aria-label", label);
+            return button;
         };
         return SceneExample;
     }());

@@ -34,16 +34,31 @@ const expandClose = "esri-icon-zoom-in-fixed";
 const scale = 4;
 const width = 250;
 const height = 250;
-const defaultSymbol = {
+const defaultDirectionSymbol = {
+    type: "picture-marker",
+    url: "assets/viewpoint.png",
+    width: 60,
+    height: 40,
+    angle: 0
+}
+/*const defaultLocationSymbol = {
+    type: "simple-marker",
+    style: "path",
+    path: "M23.3 36.98L46.56 8c-.9-.68-9.85-8-23.28-8S.9 7.32 0 8l23.26 28.98.02.02.02-.02z",
+    size: 20,
+    color: [71, 71, 71, 0.25]
+}*/
+/*const defaultDirectionSymbol = {
     type: "text",
-    color: "#FFFF00",
-    text: "\ue688",
+    color: "#333",
+    text: "\ue666",
     angle: 0,
     font: {
-        size: 22,
+        size: 14,
         family: "CalciteWebCoreIcons"
     }
-};
+};*/
+
 @subclass()
 class InsetMap extends declared(Accessor) {
 
@@ -60,7 +75,7 @@ class InsetMap extends declared(Accessor) {
         this.config = params.config;
         this.basemap = this.config.insetBasemap || this.mainView.map.basemap;
         if (this.config.locationColor) {
-            defaultSymbol.color = this.config.locationColor;
+            //  defaultDirectionSymbol.color = this.config.locationColor;
         }
         this.mapId = this.config.webmap as string || null;
     }
@@ -83,7 +98,7 @@ class InsetMap extends declared(Accessor) {
                 rotationEnabled: false
             },
             ui: {
-                //   components: []
+                components: []
             }
         });
 
@@ -94,7 +109,7 @@ class InsetMap extends declared(Accessor) {
     private _setupSync() {
         // TODO a11y for button (title)
         const expandButton = document.createElement("button");
-        expandButton.classList.add("esri-widget-button", expandOpen);
+        expandButton.classList.add("esri-widget--button", expandOpen);
         expandButton.title = "Expand";
         expandButton.setAttribute("aria-label", "Expand");
 
@@ -102,6 +117,7 @@ class InsetMap extends declared(Accessor) {
         this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
         this.insetView.when(() => {
             this._syncViews();
+            this.insetView.goTo({ target: this.mainView.center })
         });
         const viewContainerNode = document.getElementById("viewContainer");
         let splitter = null;
@@ -141,27 +157,31 @@ class InsetMap extends declared(Accessor) {
             expandButton.classList.toggle(expandClose);
 
         });
-
+        // Start with inset map expanded
+        if (this.config.insetExpand) {
+            expandButton.click();
+        }
     }
 
     private _syncViews() {
-        this.mainView.watch("extent", () => this._updatePosition()); // true
-        this.mainView.watch("camera", () => this._updatePosition()); // true
+        this.mainView.watch("extent", () => this._updatePosition());
+        this.mainView.watch("camera", () => this._updatePosition());
 
         this.insetView.on("immediate-click", async e => {
             const result = await this.mainView.map.ground.queryElevation(e.mapPoint);
-            this.mainView.goTo(result.geometry);
-            this._updatePosition(); // false 
+            this.mainView.goTo({
+                target: result.geometry
+            });
+            this._updatePosition();
         });
-        this._updatePosition(); // true
     }
     private _updatePosition() {
         this.insetView.graphics.removeAll();
         const position = this.mainView.camera.position;
-        defaultSymbol.angle = this.mainView.camera.heading;
+        defaultDirectionSymbol.angle = this.mainView.camera.heading;
         this.insetView.graphics.add(new Graphic({
             geometry: position,
-            symbol: defaultSymbol
+            symbol: defaultDirectionSymbol
         }));
 
         // Pan to graphic if it moves out of inset view 
@@ -171,16 +191,6 @@ class InsetMap extends declared(Accessor) {
             }
         });
 
-        //if (zoom) {
-
-        /* this.insetView.goTo({
-         target: this.mainView.camera.position,
-         scale:
-             this.mainView.scale *
-             scale *
-             Math.max(this.mainView.width / this.insetView.width, this.mainView.height / this.insetView.height)
-     }, { animate: true });*/
-        // }
     }
 }
 
