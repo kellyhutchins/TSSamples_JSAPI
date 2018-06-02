@@ -109,7 +109,7 @@ class InsetMap extends declared(Accessor) {
     private _setupSync() {
         // TODO a11y for button (title)
         const expandButton = document.createElement("button");
-        expandButton.classList.add("esri-widget--button", expandOpen);
+        expandButton.classList.add("esri-widget-button", expandOpen);
         expandButton.title = "Expand";
         expandButton.setAttribute("aria-label", "Expand");
 
@@ -117,6 +117,7 @@ class InsetMap extends declared(Accessor) {
         this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
         this.insetView.when(() => {
             this._syncViews();
+            this._updatePosition();
             this.insetView.goTo({ target: this.mainView.center })
         });
         const viewContainerNode = document.getElementById("viewContainer");
