@@ -51,7 +51,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/WebMap", "esri/Graphic", "esri/geometry/geometryEngineAsync", "ApplicationBase/support/itemUtils", "./splitMaps", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, WebMap, Graphic, geometryEngineAsync, itemUtils_1, splitMaps_1, decorators_1) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/WebMap", "esri/Graphic", "esri/geometry/geometryEngineAsync", "ApplicationBase/support/itemUtils", "./splitMaps", "esri/core/accessorSupport/decorators", "esri/layers/GraphicsLayer", "esri/core/requireUtils"], function (require, exports, __extends, __decorate, Accessor, WebMap, Graphic, geometryEngineAsync, itemUtils_1, splitMaps_1, decorators_1, GraphicsLayer, requireUtils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var expandOpen = "esri-icon-zoom-out-fixed";
@@ -59,13 +59,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     var scale = 4;
     var width = 250;
     var height = 250;
-    var defaultDirectionSymbol = {
+    /*const defaultDirectionSymbol = {
         type: "picture-marker",
         url: "assets/viewpoint.png",
         width: 60,
         height: 40,
         angle: 0
-    };
+    }*/
     /*const defaultLocationSymbol = {
         type: "simple-marker",
         style: "path",
@@ -73,7 +73,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         size: 20,
         color: [71, 71, 71, 0.25]
     }*/
-    /*const defaultDirectionSymbol = {
+    var defaultDirectionSymbol = {
         type: "text",
         color: "#333",
         text: "\ue666",
@@ -82,7 +82,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             size: 14,
             family: "CalciteWebCoreIcons"
         }
-    };*/
+    };
     var InsetMap = /** @class */ (function (_super) {
         __extends(InsetMap, _super);
         function InsetMap(params) {
@@ -91,7 +91,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.config = params.config;
             _this.basemap = _this.config.insetBasemap || _this.mainView.map.basemap;
             if (_this.config.locationColor) {
-                //  defaultDirectionSymbol.color = this.config.locationColor;
+                defaultDirectionSymbol.color = _this.config.locationColor;
             }
             _this.mapId = _this.config.webmap || null;
             return _this;
@@ -110,6 +110,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             else {
                                 mapProps.basemap = this.basemap;
                             }
+                            this.graphicsLayer = new GraphicsLayer();
+                            mapProps.layers = [this.graphicsLayer];
                             inset = itemUtils_1.createView({
                                 map: new WebMap(mapProps),
                                 extent: this.mainView.extent,
@@ -144,6 +146,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
             this.insetView.when(function () {
                 _this._syncViews();
+                _this._updatePosition();
                 _this.insetView.goTo({ target: _this.mainView.center });
             });
             var viewContainerNode = document.getElementById("viewContainer");
@@ -179,7 +182,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         scale: _this.mainView.scale *
                             scale *
                             Math.max(_this.mainView.width / _this.insetView.width, _this.mainView.height / _this.insetView.height)
-                    }, { animate: true });
+                    }, { animate: false });
                 }
                 expandButton.classList.toggle(expandOpen);
                 expandButton.classList.toggle(expandClose);
@@ -203,25 +206,58 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             this.mainView.goTo({
                                 target: result.geometry
                             });
-                            this._updatePosition();
+                            this._updatePosition(result.geometry);
                             return [2 /*return*/];
                     }
                 });
             }); });
+            requireUtils.when(require, [
+                "esri/views/2d/draw/support/GraphicMover"
+            ]).then(function (GraphicMover) {
+                // Setup ability to click and drag graphic
+                if (GraphicMover[0]) {
+                    _this.mover = new GraphicMover[0]({
+                        view: _this.insetView,
+                        graphics: _this.graphicsLayer.graphics
+                    });
+                    _this.mover.on("graphic-move-stop", function (e) { return __awaiter(_this, void 0, void 0, function () {
+                        var result;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, this.mainView.map.ground.queryElevation(this.insetView.toMap(e.screenPoint))];
+                                case 1:
+                                    result = _a.sent();
+                                    this.mainView.goTo({
+                                        target: result.geometry
+                                    }, { animate: false });
+                                    this._updatePosition();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); });
+                    _this.mover.on("graphic-mouse-over", function (e) {
+                        _this.insetView.set("cursor", "move");
+                    });
+                    _this.mover.on("graphic-mouse-out", function (e) {
+                        _this.insetView.set("cursor", "pointer");
+                    });
+                }
+            });
         };
-        InsetMap.prototype._updatePosition = function () {
+        InsetMap.prototype._updatePosition = function (geometry) {
             var _this = this;
-            this.insetView.graphics.removeAll();
-            var position = this.mainView.camera.position;
+            this.graphicsLayer.removeAll();
+            var position = geometry || this.mainView.camera.position;
             defaultDirectionSymbol.angle = this.mainView.camera.heading;
-            this.insetView.graphics.add(new Graphic({
+            var g = new Graphic({
                 geometry: position,
                 symbol: defaultDirectionSymbol
-            }));
+            });
+            this.graphicsLayer.add(g);
             // Pan to graphic if it moves out of inset view 
             geometryEngineAsync.contains(this.insetView.extent, position).then(function (contains) {
                 if (!contains) {
-                    _this.insetView.goTo(position);
+                    _this.insetView.goTo(position, { animate: false });
                 }
             });
         };
@@ -243,6 +279,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], InsetMap.prototype, "config", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InsetMap.prototype, "graphicsLayer", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InsetMap.prototype, "mover", void 0);
         InsetMap = __decorate([
             decorators_1.subclass()
         ], InsetMap);

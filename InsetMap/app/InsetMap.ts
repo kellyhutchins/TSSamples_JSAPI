@@ -7,6 +7,7 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 import WebMap = require("esri/WebMap");
 import WebScene = require("esri/WebScene");
 
+
 import MapView = require("esri/views/MapView");
 import SceneView = require("esri/views/SceneView");
 import Graphic = require("esri/Graphic");
@@ -25,6 +26,11 @@ import {
     property,
     subclass
 } from "esri/core/accessorSupport/decorators";
+
+import GraphicsLayer = require("esri/layers/GraphicsLayer");
+import requireUtils = require("esri/core/requireUtils");
+import { getDefault } from "dojox/gfx";
+
 export interface InsetParams {
     config: ApplicationConfig;
     mainView: SceneView;
@@ -34,13 +40,13 @@ const expandClose = "esri-icon-zoom-in-fixed";
 const scale = 4;
 const width = 250;
 const height = 250;
-const defaultDirectionSymbol = {
+/*const defaultDirectionSymbol = {
     type: "picture-marker",
     url: "assets/viewpoint.png",
     width: 60,
     height: 40,
     angle: 0
-}
+}*/
 /*const defaultLocationSymbol = {
     type: "simple-marker",
     style: "path",
@@ -48,7 +54,7 @@ const defaultDirectionSymbol = {
     size: 20,
     color: [71, 71, 71, 0.25]
 }*/
-/*const defaultDirectionSymbol = {
+const defaultDirectionSymbol = {
     type: "text",
     color: "#333",
     text: "\ue666",
@@ -57,7 +63,7 @@ const defaultDirectionSymbol = {
         size: 14,
         family: "CalciteWebCoreIcons"
     }
-};*/
+};
 
 @subclass()
 class InsetMap extends declared(Accessor) {
@@ -68,6 +74,8 @@ class InsetMap extends declared(Accessor) {
     @property() basemap: string | __esri.Basemap;
     @property() mapId: string;
     @property() config: ApplicationConfig;
+    @property() graphicsLayer: GraphicsLayer;
+    @property() mover: any;
 
     constructor(params) {
         super(params);
@@ -75,7 +83,7 @@ class InsetMap extends declared(Accessor) {
         this.config = params.config;
         this.basemap = this.config.insetBasemap || this.mainView.map.basemap;
         if (this.config.locationColor) {
-            //  defaultDirectionSymbol.color = this.config.locationColor;
+            defaultDirectionSymbol.color = this.config.locationColor;
         }
         this.mapId = this.config.webmap as string || null;
     }
@@ -89,6 +97,8 @@ class InsetMap extends declared(Accessor) {
         } else {
             mapProps.basemap = this.basemap;
         }
+        this.graphicsLayer = new GraphicsLayer();
+        mapProps.layers = [this.graphicsLayer];
         const inset = createView({
             map: new WebMap(mapProps),
             extent: this.mainView.extent,
@@ -103,13 +113,14 @@ class InsetMap extends declared(Accessor) {
         });
 
         this.insetView = await inset.then() as MapView;
+
         insetDiv.classList.remove("hide");
         this._setupSync();
     }
     private _setupSync() {
         // TODO a11y for button (title)
         const expandButton = document.createElement("button");
-        expandButton.classList.add("esri-widget-button", expandOpen);
+        expandButton.classList.add("esri-widget--button", expandOpen);
         expandButton.title = "Expand";
         expandButton.setAttribute("aria-label", "Expand");
 
@@ -152,7 +163,7 @@ class InsetMap extends declared(Accessor) {
                         this.mainView.scale *
                         scale *
                         Math.max(this.mainView.width / this.insetView.width, this.mainView.height / this.insetView.height)
-                }, { animate: true });
+                }, { animate: false });
             }
             expandButton.classList.toggle(expandOpen);
             expandButton.classList.toggle(expandClose);
@@ -173,22 +184,53 @@ class InsetMap extends declared(Accessor) {
             this.mainView.goTo({
                 target: result.geometry
             });
-            this._updatePosition();
+            this._updatePosition(result.geometry);
+        });
+        requireUtils.when(require, [
+            "esri/views/2d/draw/support/GraphicMover"
+        ]).then((GraphicMover) => {
+
+            // Setup ability to click and drag graphic
+            if (GraphicMover[0]) {
+
+                this.mover = new GraphicMover[0]({
+                    view: this.insetView,
+                    graphics: this.graphicsLayer.graphics
+                });
+
+                this.mover.on("graphic-move-stop", async (e) => {
+                    const result = await this.mainView.map.ground.queryElevation(this.insetView.toMap(e.screenPoint));
+                    this.mainView.goTo({
+                        target: result.geometry
+                    }, { animate: false });
+                    this._updatePosition();
+                });
+                this.mover.on("graphic-mouse-over", (e) => {
+                    this.insetView.set("cursor", "move");
+
+                });
+                this.mover.on("graphic-mouse-out", (e) => {
+                    this.insetView.set("cursor", "pointer");
+                });
+            }
         });
     }
-    private _updatePosition() {
-        this.insetView.graphics.removeAll();
-        const position = this.mainView.camera.position;
+    private _updatePosition(geometry?) {
+        this.graphicsLayer.removeAll();
+
+        const position = geometry || this.mainView.camera.position;
         defaultDirectionSymbol.angle = this.mainView.camera.heading;
-        this.insetView.graphics.add(new Graphic({
+        const g = new Graphic({
             geometry: position,
             symbol: defaultDirectionSymbol
-        }));
+        });
+
+        this.graphicsLayer.add(g);
 
         // Pan to graphic if it moves out of inset view 
         geometryEngineAsync.contains(this.insetView.extent, position).then((contains) => {
             if (!contains) {
-                this.insetView.goTo(position);
+                this.insetView.goTo(position, { animate: false });
             }
         });
 
