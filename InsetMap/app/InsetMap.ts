@@ -30,37 +30,26 @@ import {
 import GraphicsLayer = require("esri/layers/GraphicsLayer");
 import requireUtils = require("esri/core/requireUtils");
 import { getDefault } from "dojox/gfx";
-
+import watchUtils = require("esri/core/watchUtils");
+import esri = __esri;
 export interface InsetParams {
     config: ApplicationConfig;
     mainView: SceneView;
 }
+
 const expandOpen = "esri-icon-zoom-out-fixed";
 const expandClose = "esri-icon-zoom-in-fixed";
 const scale = 4;
 const width = 250;
 const height = 250;
-/*const defaultDirectionSymbol = {
-    type: "picture-marker",
-    url: "assets/viewpoint.png",
-    width: 60,
-    height: 40,
-    angle: 0
-}*/
-/*const defaultLocationSymbol = {
-    type: "simple-marker",
-    style: "path",
-    path: "M23.3 36.98L46.56 8c-.9-.68-9.85-8-23.28-8S.9 7.32 0 8l23.26 28.98.02.02.02-.02z",
-    size: 20,
-    color: [71, 71, 71, 0.25]
-}*/
+
 const defaultDirectionSymbol = {
     type: "text",
     color: "#333",
     text: "\ue666",
     angle: 0,
     font: {
-        size: 14,
+        size: 18,
         family: "CalciteWebCoreIcons"
     }
 };
@@ -71,11 +60,13 @@ class InsetMap extends declared(Accessor) {
     @property() locationLayer: FeatureLayer;
     @property() insetView: MapView;
     @property() mainView: SceneView;
-    @property() basemap: string | __esri.Basemap;
+    @property() basemap: string | esri.Basemap;
     @property() mapId: string;
     @property() config: ApplicationConfig;
     @property() graphicsLayer: GraphicsLayer;
     @property() mover: any;
+    @property() extentWatchHandle: esri.PausableWatchHandle;
+    @property() cameraWatchHandle: esri.PausableWatchHandle;
 
     constructor(params) {
         super(params);
@@ -91,7 +82,7 @@ class InsetMap extends declared(Accessor) {
     async createInsetView() {
 
         const insetDiv = document.getElementById("mapInset");
-        const mapProps: __esri.WebMapProperties = {};
+        const mapProps: esri.WebMapProperties = {};
         if (this.mapId) {
             mapProps.portalItem = { id: this.mapId };
         } else {
@@ -105,6 +96,7 @@ class InsetMap extends declared(Accessor) {
             scale: this.mainView.scale * scale * Math.max(this.mainView.width / width, this.mainView.height / height),
             container: insetDiv,
             constraints: {
+                snapToZoom: false,
                 rotationEnabled: false
             },
             ui: {
@@ -127,9 +119,9 @@ class InsetMap extends declared(Accessor) {
         this.insetView.ui.add(expandButton, this.config.controlPosition);
         this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
         this.insetView.when(() => {
-            this._syncViews();
             this._updatePosition();
-            this.insetView.goTo({ target: this.mainView.center })
+
+            this._syncViews();
         });
         const viewContainerNode = document.getElementById("viewContainer");
         let splitter = null;
@@ -149,22 +141,18 @@ class InsetMap extends declared(Accessor) {
                 this.mainView.ui.remove(this.insetView.container);
                 viewContainerNode.appendChild(this.insetView.container);
                 splitter = Split(["#mapMain", "#mapInset"], splitterOptions);
-                this.insetView.zoom = this.mainView.zoom;
-                this.insetView.center = this.mainView.camera.position;
+
             } else {
                 // Full move to inset  
                 if (splitter) {
                     splitter.destroy();
                 }
                 this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
-                this.insetView.goTo({
-                    target: this.mainView.camera.position,
-                    scale:
-                        this.mainView.scale *
-                        scale *
-                        Math.max(this.mainView.width / this.insetView.width, this.mainView.height / this.insetView.height)
-                }, { animate: false });
+                // expand inset a bit 
+                this.insetView.extent.expand(0.5);
+
             }
+            this._updatePosition();
             expandButton.classList.toggle(expandOpen);
             expandButton.classList.toggle(expandClose);
 
@@ -176,15 +164,14 @@ class InsetMap extends declared(Accessor) {
     }
 
     private _syncViews() {
-        this.mainView.watch("extent", () => this._updatePosition());
-        this.mainView.watch("camera", () => this._updatePosition());
+        this.extentWatchHandle = watchUtils.pausable(this.mainView, "extent", () => this._updatePosition());
+        this.cameraWatchHandle = watchUtils.pausable(this.mainView, "camera", () => this._updatePosition());
 
         this.insetView.on("immediate-click", async e => {
             const result = await this.mainView.map.ground.queryElevation(e.mapPoint);
-            this.mainView.goTo({
+            await this.mainView.goTo({
                 target: result.geometry
-            });
-            this._updatePosition(result.geometry);
+            }, { animate: true });
         });
         requireUtils.when(require, [
             "esri/views/2d/draw/support/GraphicMover"
@@ -199,15 +186,10 @@ class InsetMap extends declared(Accessor) {
                 });
 
                 this.mover.on("graphic-move-stop", async (e) => {
-                    const result = await this.mainView.map.ground.queryElevation(this.insetView.toMap(e.screenPoint));
-                    this.mainView.goTo({
-                        target: result.geometry
-                    }, { animate: false });
-                    this._updatePosition();
+                    this._pauseAndUpdate(this.insetView.toMap(e.screenPoint), false);
                 });
                 this.mover.on("graphic-mouse-over", (e) => {
                     this.insetView.set("cursor", "move");
-
                 });
                 this.mover.on("graphic-mouse-out", (e) => {
                     this.insetView.set("cursor", "pointer");
@@ -215,25 +197,39 @@ class InsetMap extends declared(Accessor) {
             }
         });
     }
-    private _updatePosition(geometry?) {
-        this.graphicsLayer.removeAll();
+    private async _pauseAndUpdate(mapPoint, animate) {
+        this.extentWatchHandle.pause();
+        this.cameraWatchHandle.pause();
+        const result = await this.mainView.map.ground.queryElevation(mapPoint);
+        await this.mainView.goTo({
+            target: result.geometry
+        }, { animate: animate });
 
+        this.extentWatchHandle.resume();
+        this.cameraWatchHandle.resume();
+        this._panInsetView(result.geometry, false);
+    }
+    _panInsetView(geometry, animate = true) {
+        geometryEngineAsync.contains(this.insetView.extent, geometry).then((contains) => {
+            if (!contains) {
+                this.insetView.goTo(geometry, { animate: animate });
+            }
+        });
+    }
+    private _updatePosition(geometry?, animate = true) {
+
+        this.graphicsLayer.removeAll();
         const position = geometry || this.mainView.camera.position;
+        console.log("VIEWPOINT", this.mainView.viewpoint.toJSON());
         defaultDirectionSymbol.angle = this.mainView.camera.heading;
         const g = new Graphic({
             geometry: position,
             symbol: defaultDirectionSymbol
         });
-
         this.graphicsLayer.add(g);
 
         // Pan to graphic if it moves out of inset view 
-        geometryEngineAsync.contains(this.insetView.extent, position).then((contains) => {
-            if (!contains) {
-                this.insetView.goTo(position, { animate: false });
-            }
-        });
-
+        this._panInsetView(position, animate);
     }
 }
 

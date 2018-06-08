@@ -51,7 +51,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/WebMap", "esri/Graphic", "esri/geometry/geometryEngineAsync", "ApplicationBase/support/itemUtils", "./splitMaps", "esri/core/accessorSupport/decorators", "esri/layers/GraphicsLayer", "esri/core/requireUtils"], function (require, exports, __extends, __decorate, Accessor, WebMap, Graphic, geometryEngineAsync, itemUtils_1, splitMaps_1, decorators_1, GraphicsLayer, requireUtils) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/WebMap", "esri/Graphic", "esri/geometry/geometryEngineAsync", "ApplicationBase/support/itemUtils", "./splitMaps", "esri/core/accessorSupport/decorators", "esri/layers/GraphicsLayer", "esri/core/requireUtils", "esri/core/watchUtils"], function (require, exports, __extends, __decorate, Accessor, WebMap, Graphic, geometryEngineAsync, itemUtils_1, splitMaps_1, decorators_1, GraphicsLayer, requireUtils, watchUtils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var expandOpen = "esri-icon-zoom-out-fixed";
@@ -59,27 +59,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     var scale = 4;
     var width = 250;
     var height = 250;
-    /*const defaultDirectionSymbol = {
-        type: "picture-marker",
-        url: "assets/viewpoint.png",
-        width: 60,
-        height: 40,
-        angle: 0
-    }*/
-    /*const defaultLocationSymbol = {
-        type: "simple-marker",
-        style: "path",
-        path: "M23.3 36.98L46.56 8c-.9-.68-9.85-8-23.28-8S.9 7.32 0 8l23.26 28.98.02.02.02-.02z",
-        size: 20,
-        color: [71, 71, 71, 0.25]
-    }*/
     var defaultDirectionSymbol = {
         type: "text",
         color: "#333",
         text: "\ue666",
         angle: 0,
         font: {
-            size: 14,
+            size: 18,
             family: "CalciteWebCoreIcons"
         }
     };
@@ -118,6 +104,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                                 scale: this.mainView.scale * scale * Math.max(this.mainView.width / width, this.mainView.height / height),
                                 container: insetDiv,
                                 constraints: {
+                                    snapToZoom: false,
                                     rotationEnabled: false
                                 },
                                 ui: {
@@ -145,9 +132,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this.insetView.ui.add(expandButton, this.config.controlPosition);
             this.mainView.ui.add(this.insetView.container, this.config.insetPosition);
             this.insetView.when(function () {
-                _this._syncViews();
                 _this._updatePosition();
-                _this.insetView.goTo({ target: _this.mainView.center });
+                _this._syncViews();
             });
             var viewContainerNode = document.getElementById("viewContainer");
             var splitter = null;
@@ -168,8 +154,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     _this.mainView.ui.remove(_this.insetView.container);
                     viewContainerNode.appendChild(_this.insetView.container);
                     splitter = splitMaps_1.default(["#mapMain", "#mapInset"], splitterOptions);
-                    _this.insetView.zoom = _this.mainView.zoom;
-                    _this.insetView.center = _this.mainView.camera.position;
                 }
                 else {
                     // Full move to inset  
@@ -177,13 +161,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         splitter.destroy();
                     }
                     _this.mainView.ui.add(_this.insetView.container, _this.config.insetPosition);
-                    _this.insetView.goTo({
-                        target: _this.mainView.camera.position,
-                        scale: _this.mainView.scale *
-                            scale *
-                            Math.max(_this.mainView.width / _this.insetView.width, _this.mainView.height / _this.insetView.height)
-                    }, { animate: false });
+                    // expand inset a bit 
+                    _this.insetView.extent.expand(0.5);
                 }
+                _this._updatePosition();
                 expandButton.classList.toggle(expandOpen);
                 expandButton.classList.toggle(expandClose);
             });
@@ -194,8 +175,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         InsetMap.prototype._syncViews = function () {
             var _this = this;
-            this.mainView.watch("extent", function () { return _this._updatePosition(); });
-            this.mainView.watch("camera", function () { return _this._updatePosition(); });
+            this.extentWatchHandle = watchUtils.pausable(this.mainView, "extent", function () { return _this._updatePosition(); });
+            this.cameraWatchHandle = watchUtils.pausable(this.mainView, "camera", function () { return _this._updatePosition(); });
             this.insetView.on("immediate-click", function (e) { return __awaiter(_this, void 0, void 0, function () {
                 var result;
                 return __generator(this, function (_a) {
@@ -203,10 +184,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         case 0: return [4 /*yield*/, this.mainView.map.ground.queryElevation(e.mapPoint)];
                         case 1:
                             result = _a.sent();
-                            this.mainView.goTo({
-                                target: result.geometry
-                            });
-                            this._updatePosition(result.geometry);
+                            return [4 /*yield*/, this.mainView.goTo({
+                                    target: result.geometry
+                                }, { animate: true })];
+                        case 2:
+                            _a.sent();
                             return [2 /*return*/];
                     }
                 });
@@ -221,18 +203,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         graphics: _this.graphicsLayer.graphics
                     });
                     _this.mover.on("graphic-move-stop", function (e) { return __awaiter(_this, void 0, void 0, function () {
-                        var result;
                         return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, this.mainView.map.ground.queryElevation(this.insetView.toMap(e.screenPoint))];
-                                case 1:
-                                    result = _a.sent();
-                                    this.mainView.goTo({
-                                        target: result.geometry
-                                    }, { animate: false });
-                                    this._updatePosition();
-                                    return [2 /*return*/];
-                            }
+                            this._pauseAndUpdate(this.insetView.toMap(e.screenPoint), false);
+                            return [2 /*return*/];
                         });
                     }); });
                     _this.mover.on("graphic-mouse-over", function (e) {
@@ -244,10 +217,44 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
             });
         };
-        InsetMap.prototype._updatePosition = function (geometry) {
+        InsetMap.prototype._pauseAndUpdate = function (mapPoint, animate) {
+            return __awaiter(this, void 0, void 0, function () {
+                var result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.extentWatchHandle.pause();
+                            this.cameraWatchHandle.pause();
+                            return [4 /*yield*/, this.mainView.map.ground.queryElevation(mapPoint)];
+                        case 1:
+                            result = _a.sent();
+                            return [4 /*yield*/, this.mainView.goTo({
+                                    target: result.geometry
+                                }, { animate: animate })];
+                        case 2:
+                            _a.sent();
+                            this.extentWatchHandle.resume();
+                            this.cameraWatchHandle.resume();
+                            this._panInsetView(result.geometry, false);
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        InsetMap.prototype._panInsetView = function (geometry, animate) {
             var _this = this;
+            if (animate === void 0) { animate = true; }
+            geometryEngineAsync.contains(this.insetView.extent, geometry).then(function (contains) {
+                if (!contains) {
+                    _this.insetView.goTo(geometry, { animate: animate });
+                }
+            });
+        };
+        InsetMap.prototype._updatePosition = function (geometry, animate) {
+            if (animate === void 0) { animate = true; }
             this.graphicsLayer.removeAll();
             var position = geometry || this.mainView.camera.position;
+            console.log("VIEWPOINT", this.mainView.viewpoint.toJSON());
             defaultDirectionSymbol.angle = this.mainView.camera.heading;
             var g = new Graphic({
                 geometry: position,
@@ -255,11 +262,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             });
             this.graphicsLayer.add(g);
             // Pan to graphic if it moves out of inset view 
-            geometryEngineAsync.contains(this.insetView.extent, position).then(function (contains) {
-                if (!contains) {
-                    _this.insetView.goTo(position, { animate: false });
-                }
-            });
+            this._panInsetView(position, animate);
         };
         __decorate([
             decorators_1.property()
@@ -285,6 +288,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], InsetMap.prototype, "mover", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InsetMap.prototype, "extentWatchHandle", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InsetMap.prototype, "cameraWatchHandle", void 0);
         InsetMap = __decorate([
             decorators_1.subclass()
         ], InsetMap);

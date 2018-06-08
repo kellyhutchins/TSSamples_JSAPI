@@ -50,6 +50,9 @@ import {
   ApplicationConfig,
   ApplicationBaseSettings
 } from "ApplicationBase/interfaces";
+
+import Expand = require("esri/widgets/Expand");
+
 declare var calcite: any;
 class SceneExample {
   //--------------------------------------------------------------------------
@@ -243,9 +246,6 @@ class SceneExample {
 
 
       }
-
-
-
 
 
 
