@@ -21,6 +21,7 @@
 */
 
 @import "./node_modules/calcite-web/dist/sass/calcite-web";
+@import "bookmarks";
 html,
 body {
   margin: 0;
@@ -126,4 +127,16 @@ body {
   width: 250px;
   height: 250px;
   cursor: pointer;
+}
+
+.svg-container {
+  height: 100%;
+  width: 100%;
+}
+
+.svg-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 30;
 }

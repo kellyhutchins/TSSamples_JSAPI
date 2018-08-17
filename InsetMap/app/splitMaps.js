@@ -71,8 +71,8 @@ define(["require", "exports"], function (require, exports) {
         return style;
     };
     var defaultGutterStyleFn = function (dim, gutSize) {
-        return (_a = {}, _a[dim] = gutSize + "px", _a);
         var _a;
+        return (_a = {}, _a[dim] = gutSize + "px", _a);
     };
     // The main function to initialize a split. Split.js thinks about each pair
     // of elements as an independant pair. Dragging the gutter between two elements

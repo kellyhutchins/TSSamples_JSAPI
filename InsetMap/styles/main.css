@@ -7124,6 +7124,92 @@ html[dir="rtl"] .margin-right-4 {
   html[dir="rtl"] .phone-gutter-right-4 {
     padding-left: 4rem; } }
 
+.app-bookmarks {
+  min-width: 250px;
+  max-width: 350px;
+  background-color: #fff;
+  border: 1px solid rgba(185, 182, 182, 0.4);
+  line-height: 16px;
+  font-size: 14px; }
+  .app-bookmarks__loading {
+    padding: 40px;
+    text-align: center; }
+  .app-bookmarks__list {
+    display: block;
+    list-style: none;
+    margin: 0;
+    padding: 0; }
+  .app-bookmarks__item {
+    padding: 8px 12px;
+    border-top: 1px solid rgba(185, 182, 182, 0.4);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center; }
+    .app-bookmarks__item:hover {
+      background-color: #e6e6e6; }
+    .app-bookmarks__item:first-child {
+      border-top: none; }
+    .app-bookmarks__item-icon {
+      margin-right: 5px; }
+    .app-bookmarks__item-name {
+      flex: 1; }
+    .app-bookmarks__item--active, .app-bookmarks__item--active:hover, .app-bookmarks__item--active:focus {
+      color: #333333;
+      background-color: #fff;
+      cursor: default; }
+    .app-bookmarks__item--active:after {
+      content: "";
+      position: absolute;
+      height: 2px;
+      top: 0;
+      background-color: #404040;
+      width: 100%;
+      z-index: 2;
+      animation: looping-progresss-bar-ani 1500ms linear infinite; }
+  .app-bookmarks--fade-in {
+    opacity: 0;
+    transition: opacity 375ms ease-out; }
+  .app-bookmarks--fade-in-active {
+    opacity: 1; }
+
+@keyframes looping-progresss-bar-ani {
+  0% {
+    left: 0%;
+    width: 0%; }
+  20% {
+    left: 0%;
+    width: 20%; }
+  80% {
+    left: 80%;
+    width: 20%; }
+  100% {
+    left: 100%;
+    width: 0%; } }
+
+html[dir="rtl"] .app-bookmarks__item--active:after {
+  animation: looping-progresss-bar-ani-rtl 1500ms linear infinite; }
+
+html[dir="rtl"] .app-bookmarks__item-icon {
+  margin-right: 0;
+  margin-left: 5px; }
+
+@keyframes looping-progresss-bar-ani-rtl {
+  0% {
+    right: 0%;
+    width: 0%; }
+  20% {
+    right: 0%;
+    width: 20%; }
+  80% {
+    right: 80%;
+    width: 20%; }
+  100% {
+    right: 100%;
+    width: 0%; } }
+
 html,
 body {
   margin: 0;
@@ -7214,3 +7300,13 @@ body {
   width: 250px;
   height: 250px;
   cursor: pointer; }
+
+.svg-container {
+  height: 100%;
+  width: 100%; }
+
+.svg-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 30; }

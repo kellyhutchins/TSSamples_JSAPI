@@ -37,7 +37,6 @@ import {
   getItemTitle,
   findQuery,
   goToMarker,
-  createWebMapFromItem
 } from "ApplicationBase/support/itemUtils";
 
 import {
@@ -46,12 +45,6 @@ import {
   setPageTitle
 } from "ApplicationBase/support/domHelper";
 
-import {
-  ApplicationConfig,
-  ApplicationBaseSettings
-} from "ApplicationBase/interfaces";
-
-import Expand = require("esri/widgets/Expand");
 
 declare var calcite: any;
 class SceneExample {
@@ -83,7 +76,7 @@ class SceneExample {
 
     this.base = base;
 
-    const { config, results, settings } = base;
+    const { config, results } = base;
     const { find, marker } = config;
     const { webSceneItems } = results;
 
@@ -108,13 +101,18 @@ class SceneExample {
     document.getElementById("title").innerHTML = config.title;
     const portalItem: any = this.base.results.applicationItem.value;
     const appProxies =
-      portalItem && portalItem.appProxies ? portalItem.appProxies : null;
+      portalItem && portalItem.applicationProxies ? portalItem.applicationProxies : null;
 
     // Setup splash screen if enabled 
     if (this.base.config.splash) {
       calcite.init();
       const splashButton = document.getElementById("splashButton");
       splashButton.classList.remove("hide");
+      splashButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" class="svg-icon">
+                <path d="M31.297 16.047c0 8.428-6.826 15.25-15.25 15.25S.797 24.475.797 16.047c0-8.424 6.826-15.25 15.25-15.25s15.25 6.826 15.25 15.25zM18 24V12h-4v12h-2v2h8v-2h-2zm0-18h-4v4h4V6z"
+                />
+              </svg>${i18n.tools.about}`;
+
 
       document.getElementById("splashContent").innerHTML = this.base.config.splashDesc;
       document.getElementById("splashTitle").innerHTML = this.base.config.splashTitle;
@@ -147,8 +145,18 @@ class SceneExample {
       ...defaultViewProperties,
       ...container
     };
+    if (base.config.transparentBackground && base.config.backgroundColor) {
+      viewProperties.alphaCompositingEnabled = true;
+      viewProperties.environment = {
+        background: {
+          type: "color",
+          color: base.config.backgroundColor
+        },
+        starsEnabled: false,
+        atmosphereEnabled: false
+      }
+    }
 
-    const { basemapUrl, basemapReferenceUrl } = config;
     createMapFromItem({ item, appProxies }).then(map =>
       createView({
         ...viewProperties,
@@ -157,19 +165,64 @@ class SceneExample {
         view.when(async () => {
           const insetMap = new InsetMap({ mainView: view, config: this.base.config });
           insetMap.createInsetView();
-          // Get inset view when ready 
-          insetMap.watch("insetView", () => {
-            const insetView = insetMap.insetView;
-          })
         });
         findQuery(find, view).then(() => goToMarker(marker, view));
         this._addMeasureWidgets(view, this.base.config);
+        this._addSearch(view, this.base.config);
+        this._createSlideGallery(view, this.base.config);
       })
     );
-
     document.body.classList.remove(CSS.loading);
   }
+  async _addSearch(view, config) {
+    if (config.search) {
+      const searchRequire = await requireUtils.when(require, [
+        "esri/widgets/Search", "esri/widgets/Expand"
+      ]);
+      if (searchRequire && searchRequire.length && searchRequire.length > 1) {
+        const Search = searchRequire[0];
+        const Expand = searchRequire[1];
+        const searchWidget = new Search({
+          view,
+          locationEnabled: true,
+        });
+        const expandSearch = new Expand({
+          view,
+          content: searchWidget
+        });
+        if (config.searchExpanded) {
+          expandSearch.expand();
+        }
+        view.ui.add(expandSearch, config.searchPosition);
 
+      }
+    }
+  }
+  async _createSlideGallery(view, config) {
+    // If the scene contains slides add custom scene view widget to app
+    if (config.slides) {
+      if (view && view.map && view.map.presentation && view.map.presentation.slides) {
+        const slideRequire = await requireUtils.when(require, [
+          "esri/widgets/Expand", "./CustomBookmarks"
+        ]);
+        if (slideRequire && slideRequire.length && slideRequire.length > 1) {
+          const Expand = slideRequire[0];
+          const CustomBookmarks = slideRequire[1];
+
+          const slideContainer = new CustomBookmarks({
+            view
+          });
+
+          const expand = new Expand({
+            view: view,
+            content: slideContainer,
+            group: config.slidePosition
+          });
+          view.ui.add(expand, config.slidesPosition);
+        }
+      }
+    }
+  }
   async _addMeasureWidgets(view, config) {
     if (config.measurement) {
       const measureRequire = await requireUtils.when(require, [
@@ -209,46 +262,9 @@ class SceneExample {
             }
             view.ui.add(measureTool, config.measurementPosition);
           }
-
         });
-        /* const areaButton = document.createElement("button");
-         areaButton.classList.add("esri-widget-button", "btn", "btn-grouped", "esri-icon-polygon");
-         areaButton.title = i18n.tools.measureArea;
-         areaButton.setAttribute("aria-label", i18n.tools.measureArea);
-         areaButton.addEventListener("click", () => {
-           if (measureTool) {
-             measureTool.destroy();
-             view.ui.remove(measureTool);
-           }
-           measureTool = new AreaMeasurement3D({
-             view: view
-           });
-           view.ui.add(measureTool, config.measurementPosition);
-         });
-         nav.appendChild(areaButton);
-         const lineButton = document.createElement("button");
-         lineButton.classList.add("esri-widget-button", "btn", "btn-grouped", "esri-icon-polyline");
-         lineButton.title = i18n.tools.measureLine;
-         lineButton.setAttribute("aria-label", i18n.tools.measureLine);
-         lineButton.addEventListener("click", () => {
-           if (measureTool) {
-             measureTool.destroy();
-             view.ui.remove(measureTool);
-           }
-           measureTool = new DirectLineMeasurement3D({
-             view: view
-           });
-           view.ui.add(measureTool, config.measurementPosition);
-         });
-         nav.appendChild(lineButton);*/
         view.ui.add(nav, config.measurementPosition);
-
-
-
       }
-
-
-
     }
   }
   _createMeasureButton(type) {
@@ -256,7 +272,7 @@ class SceneExample {
     const icon = type === "area" ? "esri-icon-polygon" : "esri-icon-polyline";
     const label = type === "area" ? i18n.tools.measureArea : i18n.tools.measureLine;
     button.dataset.type = type;
-    button.classList.add("esri-widget-button", "btn", "btn-grouped", icon);
+    button.classList.add("esri-widget-button", "btn", "btn-white", "btn-grouped", icon);
     button.title = label;
 
     button.setAttribute("aria-label", label);
